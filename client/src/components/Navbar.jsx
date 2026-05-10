@@ -1,9 +1,31 @@
-import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
 
 function Navbar() {
   const { cartItems } = useContext(CartContext);
+
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+
+    localStorage.removeItem("user");
+
+    setUser(null);
+
+    navigate("/login");
+  };
 
   return (
     <nav className="bg-gray-950 text-white px-8 py-5 flex justify-between items-center">
@@ -27,7 +49,22 @@ function Navbar() {
           </span>
         </Link>
 
-        <Link to="/login">Login</Link>
+        {user ? (
+          <>
+            <span className="text-orange-400">
+              {user.name}
+            </span>
+
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 px-4 py-2 rounded-lg"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <Link to="/login">Login</Link>
+        )}
       </div>
     </nav>
   );
