@@ -1,11 +1,13 @@
 const express = require("express");
 const cors = require("cors");
+
 require("dotenv").config();
 
 const pool = require("./config/db");
 const menuRoutes = require("./routes/menuRoutes");
 const authRoutes = require("./routes/authRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
+const orderRoutes=require("./routes/orderRoutes");
 
 const app = express();
 
@@ -14,6 +16,7 @@ app.use(express.json());
 
 app.use("/api/menu", menuRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.get("/", async (req, res) => {
   try {
