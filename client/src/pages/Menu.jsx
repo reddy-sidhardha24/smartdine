@@ -1,64 +1,168 @@
 import { useEffect, useState, useContext } from "react";
-import { getMenu } from "../api/menuApi";
+import axios from "axios";
 import { CartContext } from "../context/CartContext";
+import { toast } from "react-toastify";
 
-function Menu() {
-  const [menuItems, setMenuItems] = useState([]);
+const Menu = () => {
+  const [menu, setMenu] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
 
   const { addToCart } = useContext(CartContext);
 
   useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const data = await getMenu();
-        setMenuItems(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     fetchMenu();
   }, []);
 
+  const fetchMenu = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/menu");
+      setMenu(res.data);
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to load menu");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // UNIQUE CATEGORIES
+  const categories = [
+    "All",
+    ...new Set(menu.map((item) => item.category)),
+  ];
+
+  // FILTER LOGIC
+  const filteredMenu = menu.filter((item) => {
+    const matchesSearch = item.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchesCategory =
+      category === "All" || item.category === category;
+
+    return matchesSearch && matchesCategory;
+  });
+
+  // LOADING SCREEN
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex justify-center items-center">
+        <h1 className="text-3xl text-yellow-400 font-bold">
+          Loading Menu...
+        </h1>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-10 w-full">
-      <h1 className="text-4xl font-bold mb-8 text-center">
-        Our Menu
+    <div className="min-h-screen bg-black text-white px-6 py-10">
+
+      {/* PAGE TITLE */}
+      <h1 className="text-5xl font-extrabold text-center text-yellow-400 mb-10">
+        Explore Our Menu
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {menuItems.map((item) => (
+      {/* SEARCH BAR */}
+      <div className="max-w-2xl mx-auto mb-8">
+        <input
+          type="text"
+          placeholder="Search food items..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full p-4 rounded-xl bg-[#111827] border border-gray-700 text-white outline-none focus:border-yellow-400"
+        />
+      </div>
+
+      {/* CATEGORY BUTTONS */}
+      <div className="flex flex-wrap justify-center gap-4 mb-12">
+        {categories.map((cat, index) => (
+          <button
+            key={index}
+            onClick={() => setCategory(cat)}
+            className={`px-5 py-2 rounded-full font-semibold transition duration-300
+              ${
+                category === cat
+                  ? "bg-yellow-400 text-black"
+                  : "bg-[#111827] text-white hover:bg-yellow-500 hover:text-black"
+              }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* MENU GRID */}
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        {filteredMenu.map((item) => (
           <div
             key={item.id}
-            className="bg-gray-900 p-6 rounded-xl shadow-lg"
+            className="bg-[#111827] rounded-2xl overflow-hidden shadow-lg hover:scale-105 hover:shadow-2xl transition duration-300"
           >
-            <h2 className="text-2xl font-bold mb-2">
-              {item.name}
-            </h2>
 
-            <p className="text-gray-400 mb-3">
-              {item.description}
-            </p>
+            {/* IMAGE */}
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-full h-64 object-cover"
+            />
 
-            <p className="text-orange-400 font-semibold">
-              ₹{item.price}
-            </p>
+            {/* CARD CONTENT */}
+            <div className="p-5">
 
-            <p className="text-sm text-gray-500 mt-2">
-              {item.category}
-            </p>
+              {/* NAME + PRICE */}
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="text-2xl font-bold">
+                  {item.name}
+                </h2>
 
-            <button
-              onClick={() => addToCart(item)}
-              className="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg mt-4 w-full"
-            >
-              Add to Cart
-            </button>
+                <span className="text-yellow-400 text-xl font-bold">
+                  ₹{item.price}
+                </span>
+              </div>
+
+              {/* DESCRIPTION */}
+              <p className="text-gray-300 mb-5">
+                {item.description}
+              </p>
+
+              {/* CATEGORY + BUTTON */}
+              <div className="flex justify-between items-center">
+
+                <span className="bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-semibold">
+                  {item.category}
+                </span>
+
+                <button
+                  onClick={() => {
+                    addToCart(item);
+                    toast.success(`${item.name} added to cart`);
+                  }}
+                  className="bg-green-500 hover:bg-green-600 px-5 py-2 rounded-lg font-semibold transition duration-300"
+                >
+                  Add to Cart
+                </button>
+
+              </div>
+            </div>
           </div>
         ))}
       </div>
+
+      {/* NO ITEMS FOUND */}
+      {filteredMenu.length === 0 && (
+        <div className="text-center mt-20">
+          <h2 className="text-3xl text-gray-400 font-bold">
+            No food items found
+          </h2>
+        </div>
+      )}
+
     </div>
   );
-}
+};
 
 export default Menu;

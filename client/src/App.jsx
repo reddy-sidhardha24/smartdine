@@ -1,81 +1,41 @@
-import { Routes, Route } from "react-router-dom";
-
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Menu from "./pages/Menu";
 import Cart from "./pages/Cart";
+import Orders from "./pages/Orders";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Orders from "./pages/Orders";
-import Admin from "./pages/Admin";
+import Checkout from "./pages/Checkout";
 
-
-import ProtectedRoute from "./routes/ProtectedRoute";
+import Navbar from "./components/Navbar";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
-    <>
-      <ToastContainer />
+    <BrowserRouter>
+      <Navbar />
 
-      <div className="bg-black text-white min-h-screen flex flex-col">
+      <ToastContainer position="top-right" autoClose={2000} />
 
-        {/* NAVBAR */}
+      <Routes>
+        <Route path="/" element={<Home />} />
 
-        <Navbar />
+        <Route path="/menu" element={<Menu />} />
 
-        {/* PAGE CONTENT */}
+        <Route path="/cart" element={<Cart />} />
 
-        <div className="flex-grow">
+        <Route path="/orders" element={<Orders />} />
 
-          <Routes>
+        <Route path="/checkout" element={<Checkout />} />
 
-            {/* PUBLIC ROUTES */}
+        <Route path="/login" element={<Login />} />
 
-            <Route path="/" element={<Home />} />
-
-            <Route path="/menu" element={<Menu />} />
-
-            <Route path="/login" element={<Login />} />
-
-            <Route path="/register" element={<Register />} />
-            <Route path="/admin" element={<Admin />} />
-
-
-            {/* PROTECTED ROUTES */}
-
-            <Route
-              path="/cart"
-              element={
-                <ProtectedRoute>
-                  <Cart />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/orders"
-              element={
-                <ProtectedRoute>
-                  <Orders />
-                </ProtectedRoute>
-              }
-            />
-
-          </Routes>
-
-        </div>
-
-        {/* FOOTER */}
-
-        <Footer />
-
-      </div>
-    </>
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

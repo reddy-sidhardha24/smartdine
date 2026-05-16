@@ -1,42 +1,63 @@
 const express = require("express");
+
 const router = express.Router();
 
 const pool = require("../config/db");
+
 const authMiddleware = require("../middleware/authMiddleware");
 
 
+// ==============================
 // CREATE ORDER
+// ==============================
+
 router.post("/", authMiddleware, async (req, res) => {
   try {
 
-    const { items, total } = req.body;
+    const { items, total, address, phone, paymentMethod } = req.body;
 
     const userId = req.user.id;
 
     const newOrder = await pool.query(
       `
-      INSERT INTO orders (user_id, items, total)
-      VALUES ($1, $2, $3)
+      INSERT INTO orders
+      (user_id, items, total, address, phone, payment_method, status)
+
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+
       RETURNING *
       `,
-      [userId, JSON.stringify(items), total]
+      [
+        userId,
+        JSON.stringify(items),
+        total,
+        address,
+        phone,
+        paymentMethod,
+        "Preparing"
+      ]
     );
 
     res.status(201).json({
       message: "Order placed successfully",
-      order: newOrder.rows[0]
+      order: newOrder.rows[0],
     });
 
   } catch (error) {
+
     console.log(error);
+
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
     });
   }
 });
 
 
+// ==============================
 // GET USER ORDERS
+// ==============================
+
 router.get("/", authMiddleware, async (req, res) => {
   try {
 
@@ -44,7 +65,8 @@ router.get("/", authMiddleware, async (req, res) => {
 
     const orders = await pool.query(
       `
-      SELECT * FROM orders
+      SELECT *
+      FROM orders
       WHERE user_id = $1
       ORDER BY created_at DESC
       `,
@@ -54,10 +76,48 @@ router.get("/", authMiddleware, async (req, res) => {
     res.status(200).json(orders.rows);
 
   } catch (error) {
+
     console.log(error);
 
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
+    });
+  }
+});
+
+
+// ==============================
+// UPDATE ORDER STATUS (ADMIN)
+// ==============================
+
+router.put("/:id", async (req, res) => {
+  try {
+
+    const { status } = req.body;
+
+    const orderId = req.params.id;
+
+    const updatedOrder = await pool.query(
+      `
+      UPDATE orders
+      SET status = $1
+      WHERE id = $2
+      RETURNING *
+      `,
+      [status, orderId]
+    );
+
+    res.status(200).json({
+      message: "Order status updated",
+      order: updatedOrder.rows[0],
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server error",
     });
   }
 });

@@ -1,128 +1,87 @@
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Cart = () => {
-
-  const { cartItems, removeFromCart, clearCart } =
-    useContext(CartContext);
+function Cart() {
+  const { cartItems, removeFromCart } = useContext(CartContext);
 
   const navigate = useNavigate();
 
-  // TOTAL PRICE
   const totalPrice = cartItems.reduce(
     (total, item) => total + Number(item.price),
     0
   );
 
-  // PLACE ORDER
-  const handlePlaceOrder = async () => {
-
-    try {
-
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        alert("Please login first");
-        navigate("/login");
-        return;
-      }
-
-      const response = await axios.post(
-        "http://localhost:5000/api/orders",
-        {
-          items: cartItems,
-          total: totalPrice,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log(response.data);
-
-      alert("Order placed successfully");
-
-      clearCart();
-
-      navigate("/orders");
-
-    } catch (error) {
-
-      console.log(error);
-
-      alert("Failed to place order");
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-black text-white p-10">
-
-      <h1 className="text-4xl font-bold mb-8 text-center">
+    <div className="min-h-screen bg-black text-white p-8">
+      <h1 className="text-4xl font-bold text-yellow-400 mb-8 text-center">
         Your Cart
       </h1>
 
       {cartItems.length === 0 ? (
-        <p className="text-center text-gray-400">
+        <p className="text-center text-gray-400 text-xl">
           Cart is empty
         </p>
       ) : (
-        <div className="space-y-6">
-
-          {cartItems.map((item, index) => (
-            <div
-              key={index}
-              className="bg-gray-900 p-5 rounded-xl flex justify-between items-center"
-            >
-
-              <div>
-                <h2 className="text-2xl font-semibold">
-                  {item.name}
-                </h2>
-
-                <p className="text-yellow-400">
-                  ₹{item.price}
-                </p>
-              </div>
-
-              <button
-                onClick={() => removeFromCart(index)}
-                className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded"
+        <div className="max-w-4xl mx-auto">
+          <div className="space-y-6">
+            {cartItems.map((item, index) => (
+              <div
+                key={index}
+                className="bg-slate-900 rounded-xl overflow-hidden shadow-lg flex flex-col md:flex-row"
               >
-                Remove
-              </button>
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full md:w-64 h-52 object-cover"
+                />
 
-            </div>
-          ))}
+                <div className="flex-1 p-6 flex flex-col justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2">
+                      {item.name}
+                    </h2>
 
-          {/* CART SUMMARY */}
+                    <p className="text-gray-400 mb-3">
+                      {item.description}
+                    </p>
 
-          <div className="bg-gray-800 p-6 rounded-xl">
+                    <p className="text-yellow-400 text-xl font-bold">
+                      ₹{item.price}
+                    </p>
+                  </div>
 
-            <h2 className="text-3xl font-bold mb-4">
-              Cart Summary
-            </h2>
-
-            <p className="text-xl mb-6">
-              Total: ₹{totalPrice}
-            </p>
-
-            <button
-              onClick={handlePlaceOrder}
-              className="bg-green-500 hover:bg-green-600 text-black font-bold px-6 py-3 rounded"
-            >
-              Place Order
-            </button>
-
+                  <button
+                    onClick={() => removeFromCart(index)}
+                    className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg mt-4 w-fit"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
 
+          <div className="mt-10 bg-slate-900 p-6 rounded-xl">
+            <div className="flex justify-between items-center text-2xl font-bold">
+              <span>Total:</span>
+
+              <span className="text-yellow-400">
+                ₹{totalPrice.toFixed(2)}
+              </span>
+            </div>
+
+            <button
+              onClick={() => navigate("/checkout")}
+              className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 rounded-lg mt-6"
+            >
+              Proceed to Checkout
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
-};
+}
 
 export default Cart;
