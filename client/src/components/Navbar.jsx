@@ -1,73 +1,94 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
 
-function Navbar() {
+const Navbar = () => {
+
   const { cartItems } = useContext(CartContext);
 
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+  const token = localStorage.getItem("token");
 
   const handleLogout = () => {
+
     localStorage.removeItem("token");
 
-    localStorage.removeItem("user");
-
-    setUser(null);
+    alert("Logged out successfully");
 
     navigate("/login");
   };
 
   return (
-    <nav className="bg-gray-950 text-white px-8 py-5 flex justify-between items-center">
-      <h1 className="text-3xl font-bold text-orange-500">
+    <nav className="bg-gray-900 text-white px-10 py-5 flex justify-between items-center">
+
+      {/* LOGO */}
+
+      <Link
+        to="/"
+        className="text-3xl font-bold text-yellow-400"
+      >
         SmartDine
-      </h1>
+      </Link>
+
+      {/* NAV LINKS */}
 
       <div className="flex gap-6 items-center">
-        <Link to="/">Home</Link>
 
-        <Link to="/menu">Menu</Link>
+        <Link
+          to="/"
+          className="hover:text-yellow-400"
+        >
+          Home
+        </Link>
+
+        <Link
+          to="/menu"
+          className="hover:text-yellow-400"
+        >
+          Menu
+        </Link>
 
         <Link
           to="/cart"
-          className="relative"
+          className="hover:text-yellow-400 relative"
         >
           Cart
 
-          <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded-full absolute -top-3 -right-5">
-            {cartItems.length}
-          </span>
+          {cartItems.length > 0 && (
+            <span className="absolute -top-3 -right-4 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+              {cartItems.length}
+            </span>
+          )}
         </Link>
 
-        {user ? (
-          <>
-            <span className="text-orange-400">
-              {user.name}
-            </span>
+        <Link
+          to="/orders"
+          className="hover:text-yellow-400"
+        >
+          Orders
+        </Link>
 
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 px-4 py-2 rounded-lg"
-            >
-              Logout
-            </button>
-          </>
+        {!token ? (
+          <Link
+            to="/login"
+            className="hover:text-yellow-400"
+          >
+            Login
+          </Link>
         ) : (
-          <Link to="/login">Login</Link>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded"
+          >
+            Logout
+          </button>
         )}
+
       </div>
+
     </nav>
   );
-}
+};
 
 export default Navbar;

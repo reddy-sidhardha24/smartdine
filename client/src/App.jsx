@@ -22,16 +22,27 @@ function App() {
 
       <div className="bg-black text-white min-h-screen flex flex-col">
 
+        {/* NAVBAR */}
+
         <Navbar />
+
+        {/* PAGE CONTENT */}
 
         <div className="flex-grow">
 
           <Routes>
 
+            {/* PUBLIC ROUTES */}
+
             <Route path="/" element={<Home />} />
 
             <Route path="/menu" element={<Menu />} />
-            <Route path="/orders" element={<Orders />} />
+
+            <Route path="/login" element={<Login />} />
+
+            <Route path="/register" element={<Register />} />
+
+            {/* PROTECTED ROUTES */}
 
             <Route
               path="/cart"
@@ -42,13 +53,20 @@ function App() {
               }
             />
 
-            <Route path="/login" element={<Login />} />
-
-            <Route path="/register" element={<Register />} />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              }
+            />
 
           </Routes>
 
         </div>
+
+        {/* FOOTER */}
 
         <Footer />
 
