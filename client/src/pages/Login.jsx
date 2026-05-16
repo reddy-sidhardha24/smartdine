@@ -1,9 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+const Login = () => {
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -22,40 +22,37 @@ function Login() {
     e.preventDefault();
 
     try {
+
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
         formData
       );
 
-      // save token
-      localStorage.setItem(
-        "token",
-        response.data.token
-      );
+      console.log(response.data);
 
-      // save user
-      localStorage.setItem(
-        "user",
-        JSON.stringify(response.data.user)
-      );
+      // SAVE JWT TOKEN
+      localStorage.setItem("token", response.data.token);
 
-      toast.success("Login successful");
+      alert("Login successful");
 
-      navigate("/");
+      navigate("/orders");
+
     } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Login failed"
-      );
+
+      console.log(error);
+
+      alert("Invalid credentials");
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+
       <form
         onSubmit={handleSubmit}
-        className="bg-gray-900 p-10 rounded-xl w-[400px]"
+        className="bg-gray-900 p-8 rounded-xl shadow-lg w-[350px]"
       >
+
         <h1 className="text-3xl font-bold mb-6 text-center">
           Login
         </h1>
@@ -63,28 +60,33 @@ function Login() {
         <input
           type="email"
           name="email"
-          placeholder="Enter email"
-          className="w-full p-3 mb-4 rounded bg-gray-800"
+          placeholder="Enter Email"
+          value={formData.email}
           onChange={handleChange}
+          className="w-full p-3 mb-4 rounded bg-gray-800 border border-gray-700"
+          required
         />
 
         <input
           type="password"
           name="password"
-          placeholder="Enter password"
-          className="w-full p-3 mb-6 rounded bg-gray-800"
+          placeholder="Enter Password"
+          value={formData.password}
           onChange={handleChange}
+          className="w-full p-3 mb-4 rounded bg-gray-800 border border-gray-700"
+          required
         />
 
         <button
           type="submit"
-          className="w-full bg-orange-500 hover:bg-orange-600 p-3 rounded-lg"
+          className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded"
         >
           Login
         </button>
+
       </form>
     </div>
   );
-}
+};
 
 export default Login;

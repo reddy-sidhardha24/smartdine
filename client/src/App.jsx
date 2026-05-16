@@ -8,6 +8,7 @@ import Menu from "./pages/Menu";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Orders from "./pages/Orders";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -30,6 +31,7 @@ function App() {
             <Route path="/" element={<Home />} />
 
             <Route path="/menu" element={<Menu />} />
+            <Route path="/orders" element={<Orders />} />
 
             <Route
               path="/cart"
