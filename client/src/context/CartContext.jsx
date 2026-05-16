@@ -2,17 +2,28 @@ import { createContext, useState } from "react";
 
 export const CartContext = createContext();
 
-function CartProvider({ children }) {
+const CartProvider = ({ children }) => {
+
   const [cartItems, setCartItems] = useState([]);
 
+  // ADD ITEM
   const addToCart = (item) => {
-    setCartItems((prev) => [...prev, item]);
+    setCartItems([...cartItems, item]);
   };
 
-  const removeFromCart = (indexToRemove) => {
-    setCartItems((prev) =>
-      prev.filter((_, index) => index !== indexToRemove)
-    );
+  // REMOVE ITEM
+  const removeFromCart = (index) => {
+
+    const updatedCart = [...cartItems];
+
+    updatedCart.splice(index, 1);
+
+    setCartItems(updatedCart);
+  };
+
+  // CLEAR CART
+  const clearCart = () => {
+    setCartItems([]);
   };
 
   return (
@@ -21,11 +32,12 @@ function CartProvider({ children }) {
         cartItems,
         addToCart,
         removeFromCart,
+        clearCart,
       }}
     >
       {children}
     </CartContext.Provider>
   );
-}
+};
 
 export default CartProvider;
