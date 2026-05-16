@@ -9,6 +9,8 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Orders from "./pages/Orders";
+import Admin from "./pages/Admin";
+
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -41,6 +43,8 @@ function App() {
             <Route path="/login" element={<Login />} />
 
             <Route path="/register" element={<Register />} />
+            <Route path="/admin" element={<Admin />} />
+
 
             {/* PROTECTED ROUTES */}
 
