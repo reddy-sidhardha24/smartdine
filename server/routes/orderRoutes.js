@@ -8,20 +8,34 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 
 // ==============================
-// CREATE ORDER
+// PLACE ORDER
 // ==============================
 
 router.post("/", authMiddleware, async (req, res) => {
   try {
 
-    const { items, total, address, phone, paymentMethod } = req.body;
+    const {
+      items,
+      total,
+      address,
+      phone,
+      paymentMethod,
+    } = req.body;
 
     const userId = req.user.id;
 
     const newOrder = await pool.query(
       `
       INSERT INTO orders
-      (user_id, items, total, address, phone, payment_method, status)
+      (
+        user_id,
+        items,
+        total,
+        address,
+        phone,
+        payment_method,
+        status
+      )
 
       VALUES ($1, $2, $3, $4, $5, $6, $7)
 
@@ -34,7 +48,7 @@ router.post("/", authMiddleware, async (req, res) => {
         address,
         phone,
         paymentMethod,
-        "Preparing"
+        "Preparing",
       ]
     );
 
@@ -73,7 +87,7 @@ router.get("/", authMiddleware, async (req, res) => {
       [userId]
     );
 
-    res.status(200).json(orders.rows);
+    res.json(orders.rows);
 
   } catch (error) {
 
@@ -87,15 +101,39 @@ router.get("/", authMiddleware, async (req, res) => {
 
 
 // ==============================
-// UPDATE ORDER STATUS (ADMIN)
+// GET ALL ORDERS (ADMIN)
+// ==============================
+
+router.get("/all", async (req, res) => {
+  try {
+
+    const orders = await pool.query(`
+      SELECT *
+      FROM orders
+      ORDER BY created_at DESC
+    `);
+
+    res.json(orders.rows);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
+
+
+// ==============================
+// UPDATE ORDER STATUS
 // ==============================
 
 router.put("/:id", async (req, res) => {
   try {
 
     const { status } = req.body;
-
-    const orderId = req.params.id;
 
     const updatedOrder = await pool.query(
       `
@@ -104,13 +142,10 @@ router.put("/:id", async (req, res) => {
       WHERE id = $2
       RETURNING *
       `,
-      [status, orderId]
+      [status, req.params.id]
     );
 
-    res.status(200).json({
-      message: "Order status updated",
-      order: updatedOrder.rows[0],
-    });
+    res.json(updatedOrder.rows[0]);
 
   } catch (error) {
 
@@ -121,5 +156,53 @@ router.put("/:id", async (req, res) => {
     });
   }
 });
+
+
+// ==============================
+// ADMIN DASHBOARD STATS
+// ==============================
+
+router.get("/admin/stats", async (req, res) => {
+  try {
+
+    const totalOrdersResult = await pool.query(
+      "SELECT COUNT(*) FROM orders"
+    );
+
+    const revenueResult = await pool.query(
+      "SELECT SUM(total) FROM orders"
+    );
+
+    const pendingResult = await pool.query(
+      "SELECT COUNT(*) FROM orders WHERE status != 'Delivered'"
+    );
+
+    const deliveredResult = await pool.query(
+      "SELECT COUNT(*) FROM orders WHERE status = 'Delivered'"
+    );
+
+    res.json({
+      totalOrders: totalOrdersResult.rows[0].count,
+
+      totalRevenue:
+        revenueResult.rows[0].sum || 0,
+
+      pendingOrders:
+        pendingResult.rows[0].count,
+
+      deliveredOrders:
+        deliveredResult.rows[0].count,
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch stats",
+    });
+  }
+});
+
 
 module.exports = router;

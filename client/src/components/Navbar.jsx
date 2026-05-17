@@ -1,91 +1,174 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { CartContext } from "../context/CartContext";
+import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+
+import {
+  FaShoppingCart,
+  FaBars,
+  FaTimes,
+} from "react-icons/fa";
 
 const Navbar = () => {
 
-  const { cartItems } = useContext(CartContext);
+  const location = useLocation();
 
-  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const token = localStorage.getItem("token");
-
-  const handleLogout = () => {
-
-    localStorage.removeItem("token");
-
-    alert("Logged out successfully");
-
-    navigate("/login");
+  const navLink = (path) => {
+    return location.pathname === path
+      ? "text-yellow-400 font-bold"
+      : "text-white hover:text-yellow-400";
   };
 
   return (
-    <nav className="bg-gray-900 text-white px-10 py-5 flex justify-between items-center">
+    <nav className="sticky top-0 z-50 bg-black/80 backdrop-blur-lg border-b border-slate-800">
 
-      {/* LOGO */}
+      <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
 
-      <Link
-        to="/"
-        className="text-3xl font-bold text-yellow-400"
-      >
-        SmartDine
-      </Link>
-
-      {/* NAV LINKS */}
-
-      <div className="flex gap-6 items-center">
+        {/* LOGO */}
 
         <Link
           to="/"
-          className="hover:text-yellow-400"
+          className="text-4xl font-extrabold text-yellow-400"
         >
-          Home
+          SmartDine
         </Link>
 
-        <Link
-          to="/menu"
-          className="hover:text-yellow-400"
-        >
-          Menu
-        </Link>
+        {/* DESKTOP MENU */}
 
-        <Link
-          to="/cart"
-          className="hover:text-yellow-400 relative"
-        >
-          Cart
+        <div className="hidden md:flex items-center gap-8 text-lg">
 
-          {cartItems.length > 0 && (
-            <span className="absolute -top-3 -right-4 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-              {cartItems.length}
-            </span>
-          )}
-        </Link>
-
-        <Link
-          to="/orders"
-          className="hover:text-yellow-400"
-        >
-          Orders
-        </Link>
-
-        {!token ? (
           <Link
-            to="/login"
-            className="hover:text-yellow-400"
+            to="/"
+            className={navLink("/")}
           >
-            Login
+            Home
           </Link>
-        ) : (
+
+          <Link
+            to="/menu"
+            className={navLink("/menu")}
+          >
+            Menu
+          </Link>
+
+          <Link
+            to="/orders"
+            className={navLink("/orders")}
+          >
+            Orders
+          </Link>
+
+          <Link
+            to="/admin/dashboard"
+            className={navLink("/admin/dashboard")}
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            to="/admin/orders"
+            className={navLink("/admin/orders")}
+          >
+            Admin
+          </Link>
+
+          <Link
+            to="/cart"
+            className="relative"
+          >
+            <FaShoppingCart className="text-2xl text-yellow-400" />
+          </Link>
+
           <button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded"
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/login";
+            }}
+            className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl font-semibold"
           >
             Logout
           </button>
-        )}
+
+        </div>
+
+        {/* MOBILE BUTTON */}
+
+        <button
+          className="md:hidden text-3xl text-yellow-400"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <FaTimes /> : <FaBars />}
+        </button>
 
       </div>
+
+      {/* MOBILE MENU */}
+
+      {menuOpen && (
+
+        <div className="md:hidden bg-slate-950 border-t border-slate-800 px-6 py-6 space-y-5 text-lg">
+
+          <Link
+            to="/"
+            className={`block ${navLink("/")}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            Home
+          </Link>
+
+          <Link
+            to="/menu"
+            className={`block ${navLink("/menu")}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            Menu
+          </Link>
+
+          <Link
+            to="/orders"
+            className={`block ${navLink("/orders")}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            Orders
+          </Link>
+
+          <Link
+            to="/admin/dashboard"
+            className={`block ${navLink("/admin/dashboard")}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            to="/admin/orders"
+            className={`block ${navLink("/admin/orders")}`}
+            onClick={() => setMenuOpen(false)}
+          >
+            Admin Orders
+          </Link>
+
+          <Link
+            to="/cart"
+            className="block text-yellow-400"
+            onClick={() => setMenuOpen(false)}
+          >
+            Cart
+          </Link>
+
+          <button
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/login";
+            }}
+            className="w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl font-semibold"
+          >
+            Logout
+          </button>
+
+        </div>
+
+      )}
 
     </nav>
   );

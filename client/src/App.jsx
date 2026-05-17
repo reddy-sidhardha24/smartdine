@@ -7,6 +7,8 @@ import Orders from "./pages/Orders";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Checkout from "./pages/Checkout";
+import AdminOrders from "./pages/AdminOrders";
+import AdminDashboard from "./pages/AdminDashboard";
 
 import Navbar from "./components/Navbar";
 
@@ -34,6 +36,8 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
+        <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
   );
