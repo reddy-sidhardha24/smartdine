@@ -1,90 +1,181 @@
 import { useState } from "react";
+
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+
+import { Link, useNavigate } from "react-router-dom";
+
+import { toast } from "react-toastify";
 
 const Login = () => {
 
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e) => {
+  // LOGIN FUNCTION
+
+  const handleLogin = async (e) => {
+
     e.preventDefault();
+
+    // EMPTY VALIDATION
+
+    if (
+      !email.trim() ||
+      !password.trim()
+    ) {
+
+      toast.error("All fields are required");
+
+      return;
+
+    }
+
+    // EMAIL VALIDATION
+
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+
+      toast.error("Enter valid email");
+
+      return;
+
+    }
+
+    // PASSWORD VALIDATION
+
+    if (password.length < 6) {
+
+      toast.error(
+        "Password must contain at least 6 characters"
+      );
+
+      return;
+
+    }
 
     try {
 
-      const response = await axios.post(
+      const res = await axios.post(
         "http://localhost:5000/api/auth/login",
-        formData
+        {
+          email,
+          password,
+        }
       );
 
-      console.log(response.data);
+      localStorage.setItem(
+        "token",
+        res.data.token
+      );
 
-      // SAVE JWT TOKEN
-      localStorage.setItem("token", response.data.token);
+      toast.success("Login successful");
 
-      alert("Login successful");
-
-      navigate("/orders");
+      navigate("/");
 
     } catch (error) {
 
       console.log(error);
 
-      alert("Invalid credentials");
+      toast.error(
+        error.response?.data?.message ||
+        "Login failed"
+      );
+
     }
+
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white">
+    <div className="min-h-screen bg-black flex items-center justify-center px-6">
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-gray-900 p-8 rounded-xl shadow-lg w-[350px]"
-      >
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-10 shadow-2xl">
 
-        <h1 className="text-3xl font-bold mb-6 text-center">
+        {/* TITLE */}
+
+        <h1 className="text-5xl font-extrabold text-center text-yellow-400 mb-10">
           Login
         </h1>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full p-3 mb-4 rounded bg-gray-800 border border-gray-700"
-          required
-        />
+        {/* FORM */}
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Enter Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full p-3 mb-4 rounded bg-gray-800 border border-gray-700"
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded"
+        <form
+          onSubmit={handleLogin}
+          className="space-y-6"
         >
-          Login
-        </button>
 
-      </form>
+          {/* EMAIL */}
+
+          <div>
+
+            <label className="block mb-2 text-lg font-semibold text-white">
+              Email Address
+            </label>
+
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
+              className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none focus:border-yellow-400"
+            />
+
+          </div>
+
+          {/* PASSWORD */}
+
+          <div>
+
+            <label className="block mb-2 text-lg font-semibold text-white">
+              Password
+            </label>
+
+            <input
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
+              className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none focus:border-yellow-400"
+            />
+
+          </div>
+
+          {/* BUTTON */}
+
+          <button
+            type="submit"
+            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-4 rounded-2xl text-xl font-bold transition duration-300"
+          >
+            Login
+          </button>
+
+        </form>
+
+        {/* REGISTER LINK */}
+
+        <p className="text-center text-gray-400 mt-8">
+
+          Don't have an account?
+
+          <Link
+            to="/register"
+            className="text-yellow-400 font-bold ml-2 hover:underline"
+          >
+            Register
+          </Link>
+
+        </p>
+
+      </div>
+
     </div>
   );
 };

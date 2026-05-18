@@ -8,6 +8,7 @@ const menuRoutes = require("./routes/menuRoutes");
 const authRoutes = require("./routes/authRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 const orderRoutes=require("./routes/orderRoutes");
+const reviewRoutes=require("./routes/reviewRoutes");
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/api/menu", menuRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/reviews",reviewRoutes);
 
 app.get("/", async (req, res) => {
   try {

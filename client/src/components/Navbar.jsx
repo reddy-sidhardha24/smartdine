@@ -58,12 +58,26 @@ const Navbar = () => {
             Orders
           </Link>
 
+           <Link
+             to="/careers"
+             className={navLink("/careers")}
+          >
+           Careers
+          </Link>
+
           <Link
             to="/admin/dashboard"
             className={navLink("/admin/dashboard")}
           >
             Dashboard
           </Link>
+
+          <Link
+  to="/admin/reviews"
+  className={navLink("/admin/reviews")}
+>
+  Reviews
+</Link>
 
           <Link
             to="/admin/orders"
@@ -78,6 +92,8 @@ const Navbar = () => {
           >
             <FaShoppingCart className="text-2xl text-yellow-400" />
           </Link>
+
+          
 
           <button
             onClick={() => {
@@ -132,6 +148,8 @@ const Navbar = () => {
             Orders
           </Link>
 
+         
+
           <Link
             to="/admin/dashboard"
             className={`block ${navLink("/admin/dashboard")}`}
@@ -155,6 +173,8 @@ const Navbar = () => {
           >
             Cart
           </Link>
+
+          
 
           <button
             onClick={() => {

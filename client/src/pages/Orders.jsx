@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
+
 import axios from "axios";
+
+import { Link } from "react-router-dom";
+
+import { toast } from "react-toastify";
 
 const Orders = () => {
 
   const [orders, setOrders] = useState([]);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  const [loading, setLoading] = useState(true);
+
+  // FETCH ORDERS
 
   const fetchOrders = async () => {
 
@@ -28,77 +33,169 @@ const Orders = () => {
 
     } catch (error) {
 
-      console.error(error);
+      console.log(error);
+
+      toast.error("Failed to fetch orders");
+
+    } finally {
+
+      setLoading(false);
 
     }
+
   };
 
-  return (
-    <div className="min-h-screen bg-black text-white px-6 py-10">
+  useEffect(() => {
 
-      <h1 className="text-5xl font-bold text-center text-yellow-400 mb-12">
+    fetchOrders();
+
+  }, []);
+
+  // LOADING SCREEN
+
+  if (loading) {
+
+    return (
+
+      <div className="min-h-screen bg-black flex items-center justify-center">
+
+        <h1 className="text-5xl font-bold text-yellow-400 animate-pulse">
+          Loading Orders...
+        </h1>
+
+      </div>
+
+    );
+
+  }
+
+  // EMPTY ORDERS SCREEN
+
+  if (orders.length === 0) {
+
+    return (
+
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 text-center">
+
+        {/* IMAGE */}
+
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png"
+          alt="No Orders"
+          className="w-56 mb-10 opacity-80"
+        />
+
+        {/* TITLE */}
+
+        <h1 className="text-5xl font-extrabold text-yellow-400 mb-6">
+
+          No Orders Yet
+
+        </h1>
+
+        {/* DESCRIPTION */}
+
+        <p className="text-gray-400 text-xl max-w-2xl leading-relaxed mb-10">
+
+          You haven't placed any food orders yet.
+          Start exploring our delicious menu and enjoy premium food delivery.
+
+        </p>
+
+        {/* BUTTON */}
+
+        <Link
+          to="/menu"
+          className="bg-yellow-400 hover:bg-yellow-500 text-black px-10 py-4 rounded-2xl text-xl font-bold transition duration-300"
+        >
+          Order Now
+        </Link>
+
+      </div>
+
+    );
+
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white px-6 py-12">
+
+      {/* PAGE TITLE */}
+
+      <h1 className="text-5xl font-extrabold text-center text-yellow-400 mb-14">
         My Orders
       </h1>
 
-      <div className="max-w-5xl mx-auto space-y-8">
+      {/* ORDERS LIST */}
+
+      <div className="max-w-7xl mx-auto space-y-8">
 
         {orders.map((order) => (
 
           <div
             key={order.id}
-            className="bg-gradient-to-r from-slate-900 to-slate-800 border border-slate-700 rounded-3xl p-8 shadow-2xl"
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl"
           >
 
             {/* HEADER */}
 
-            <div className="flex justify-between items-start mb-6 flex-wrap gap-4">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-8">
 
               <div>
 
-                <h2 className="text-4xl font-bold text-yellow-400">
+                <h2 className="text-3xl font-bold text-yellow-400 mb-2">
                   Order #{order.id}
                 </h2>
 
-                <p className="text-gray-400 mt-2">
+                <p className="text-gray-400">
                   {new Date(order.created_at).toLocaleString()}
                 </p>
 
               </div>
 
-              {/* STATUS BADGE */}
+              {/* STATUS */}
 
-              <div
-                className={`px-5 py-2 rounded-full text-sm font-bold shadow-lg ${
-                  order.status === "Preparing"
-                    ? "bg-yellow-400 text-black"
+              <span
+                className={`px-6 py-3 rounded-full text-lg font-bold w-fit
+                  ${
+                    order.status === "Delivered"
+                      ? "bg-green-500 text-white"
 
-                    : order.status === "Out for Delivery"
-                    ? "bg-blue-500 text-white"
+                      : order.status === "Out for Delivery"
+                      ? "bg-blue-500 text-white"
 
-                    : "bg-green-500 text-white"
-                }`}
+                      : "bg-yellow-400 text-black"
+                  }`}
               >
                 {order.status}
-              </div>
+              </span>
 
             </div>
 
             {/* ITEMS */}
 
-            <div className="space-y-4 mb-8">
+            <div className="space-y-5 mb-8">
 
               {order.items.map((item, index) => (
 
                 <div
                   key={index}
-                  className="flex justify-between items-center border-b border-slate-700 pb-3"
+                  className="bg-black/40 border border-slate-700 rounded-2xl p-5 flex flex-col md:flex-row md:justify-between md:items-center gap-4"
                 >
 
-                  <h3 className="text-lg font-semibold">
-                    {item.name}
-                  </h3>
+                  <div>
 
-                  <p className="text-yellow-300 font-bold">
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      {item.name}
+                    </h3>
+
+                    <p className="text-gray-400">
+                      {item.restaurant_name}
+                    </p>
+
+                  </div>
+
+                  <p className="text-2xl font-bold text-green-400">
                     ₹{item.price}
                   </p>
 
@@ -108,107 +205,53 @@ const Orders = () => {
 
             </div>
 
-            {/* DELIVERY TRACKER */}
-
-            <div className="flex items-center gap-4 mt-6 flex-wrap mb-10">
-
-              {/* PREPARING */}
-
-              <div className="flex items-center gap-2">
-
-                <div
-                  className={`w-5 h-5 rounded-full ${
-                    order.status === "Preparing" ||
-                    order.status === "Out for Delivery" ||
-                    order.status === "Delivered"
-                      ? "bg-yellow-400"
-                      : "bg-gray-600"
-                  }`}
-                ></div>
-
-                <p className="text-sm font-semibold">
-                  Preparing
-                </p>
-
-              </div>
-
-              <div className="w-10 h-1 bg-gray-700 rounded"></div>
-
-              {/* OUT FOR DELIVERY */}
-
-              <div className="flex items-center gap-2">
-
-                <div
-                  className={`w-5 h-5 rounded-full ${
-                    order.status === "Out for Delivery" ||
-                    order.status === "Delivered"
-                      ? "bg-blue-400"
-                      : "bg-gray-600"
-                  }`}
-                ></div>
-
-                <p className="text-sm font-semibold">
-                  Out for Delivery
-                </p>
-
-              </div>
-
-              <div className="w-10 h-1 bg-gray-700 rounded"></div>
-
-              {/* DELIVERED */}
-
-              <div className="flex items-center gap-2">
-
-                <div
-                  className={`w-5 h-5 rounded-full ${
-                    order.status === "Delivered"
-                      ? "bg-green-400"
-                      : "bg-gray-600"
-                  }`}
-                ></div>
-
-                <p className="text-sm font-semibold">
-                  Delivered
-                </p>
-
-              </div>
-
-            </div>
-
             {/* ORDER DETAILS */}
 
-            <div className="space-y-3 text-gray-300">
+            <div className="grid md:grid-cols-2 gap-8 border-t border-slate-700 pt-8">
 
-              <p>
-                <span className="font-bold text-white">
-                  Address:
-                </span>{" "}
-                {order.address}
-              </p>
+              {/* ADDRESS */}
 
-              <p>
-                <span className="font-bold text-white">
-                  Phone:
-                </span>{" "}
-                {order.phone}
-              </p>
+              <div>
 
-              <p>
-                <span className="font-bold text-white">
-                  Payment:
-                </span>{" "}
-                {order.payment_method}
-              </p>
+                <h3 className="text-2xl font-bold text-yellow-400 mb-4">
+                  Delivery Address
+                </h3>
 
-            </div>
+                <p className="text-gray-300 leading-relaxed">
+                  {order.address}
+                </p>
 
-            {/* TOTAL */}
+              </div>
 
-            <div className="mt-8">
+              {/* PAYMENT + TOTAL */}
 
-              <h2 className="text-4xl font-extrabold text-yellow-400">
-                Total: ₹{order.total}
-              </h2>
+              <div className="space-y-4">
+
+                <div className="flex justify-between items-center">
+
+                  <p className="text-xl text-gray-300">
+                    Payment Method
+                  </p>
+
+                  <p className="text-xl font-bold text-white">
+                    {order.paymentmethod}
+                  </p>
+
+                </div>
+
+                <div className="flex justify-between items-center">
+
+                  <p className="text-2xl font-bold">
+                    Total
+                  </p>
+
+                  <p className="text-4xl font-extrabold text-green-400">
+                    ₹{order.total}
+                  </p>
+
+                </div>
+
+              </div>
 
             </div>
 

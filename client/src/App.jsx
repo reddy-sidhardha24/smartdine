@@ -9,8 +9,11 @@ import Register from "./pages/Register";
 import Checkout from "./pages/Checkout";
 import AdminOrders from "./pages/AdminOrders";
 import AdminDashboard from "./pages/AdminDashboard";
+import Careers from "./pages/Careers";
+import AdminReviews from "./pages/AdminReviews";
 
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -38,7 +41,10 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/admin/reviews" element={<AdminReviews />} />
       </Routes>
+      <Footer/>
     </BrowserRouter>
   );
 }

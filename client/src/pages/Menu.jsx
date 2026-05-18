@@ -16,11 +16,17 @@ const Menu = () => {
 
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const [reviews, setReviews] = useState([]);
+
+  const [reviewForm, setReviewForm] = useState({
+    customer_name: "",
+    rating: 5,
+    comment: "",
+  });
+
   const { addToCart } = useContext(CartContext);
 
-  useEffect(() => {
-    fetchMenu();
-  }, []);
+  // FETCH MENU
 
   const fetchMenu = async () => {
 
@@ -43,6 +49,81 @@ const Menu = () => {
       setLoading(false);
 
     }
+
+  };
+
+  // FETCH REVIEWS
+
+  const fetchReviews = async () => {
+
+    try {
+
+      const res = await axios.get(
+        "http://localhost:5000/api/reviews"
+      );
+
+      setReviews(res.data);
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+  // LOAD DATA
+
+  useEffect(() => {
+
+    fetchMenu();
+
+    fetchReviews();
+
+  }, []);
+
+  // ADD REVIEW
+
+  const handleReviewSubmit = async () => {
+
+    if (
+      !reviewForm.customer_name ||
+      !reviewForm.comment
+    ) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    try {
+
+      await axios.post(
+        "http://localhost:5000/api/reviews",
+        {
+          food_name: selectedItem.name,
+          customer_name: reviewForm.customer_name,
+          rating: reviewForm.rating,
+          comment: reviewForm.comment,
+        }
+      );
+
+      toast.success("Review added");
+
+      fetchReviews();
+
+      setReviewForm({
+        customer_name: "",
+        rating: 5,
+        comment: "",
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error("Failed to add review");
+
+    }
+
   };
 
   // UNIQUE CATEGORIES
@@ -52,7 +133,7 @@ const Menu = () => {
     ...new Set(menu.map((item) => item.category)),
   ];
 
-  // FILTER LOGIC
+  // FILTER MENU
 
   const filteredMenu = menu.filter((item) => {
 
@@ -65,56 +146,19 @@ const Menu = () => {
       item.category === category;
 
     return matchesSearch && matchesCategory;
+
   });
 
-  // LOADING SKELETON
+  // LOADING SCREEN
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black px-6 py-10">
 
-        <h1 className="text-5xl font-bold text-center text-yellow-400 mb-12">
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+
+        <h1 className="text-5xl font-bold text-yellow-400 animate-pulse">
           Loading Menu...
         </h1>
-
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-
-          {[...Array(8)].map((_, index) => (
-
-            <div
-              key={index}
-              className="bg-slate-900 rounded-3xl overflow-hidden animate-pulse"
-            >
-
-              {/* IMAGE */}
-
-              <div className="h-64 bg-slate-800"></div>
-
-              {/* CONTENT */}
-
-              <div className="p-5 space-y-4">
-
-                <div className="h-6 bg-slate-700 rounded w-3/4"></div>
-
-                <div className="h-4 bg-slate-700 rounded"></div>
-
-                <div className="h-4 bg-slate-700 rounded w-5/6"></div>
-
-                <div className="flex justify-between items-center pt-3">
-
-                  <div className="h-8 w-20 bg-slate-700 rounded-full"></div>
-
-                  <div className="h-10 w-28 bg-slate-700 rounded-xl"></div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
 
       </div>
     );
@@ -123,13 +167,13 @@ const Menu = () => {
   return (
     <div className="min-h-screen bg-black text-white px-6 py-10">
 
-      {/* PAGE TITLE */}
+      {/* TITLE */}
 
       <h1 className="text-5xl font-extrabold text-center text-yellow-400 mb-10">
         Explore Our Menu
       </h1>
 
-      {/* SEARCH BAR */}
+      {/* SEARCH */}
 
       <div className="max-w-2xl mx-auto mb-8">
 
@@ -190,7 +234,7 @@ const Menu = () => {
               }}
             />
 
-            {/* CARD CONTENT */}
+            {/* CONTENT */}
 
             <div className="p-5">
 
@@ -210,9 +254,31 @@ const Menu = () => {
 
               {/* DESCRIPTION */}
 
-              <p className="text-gray-300 mb-5">
+              <p className="text-gray-300 mb-4">
                 {item.description}
               </p>
+
+              {/* RESTAURANT DETAILS */}
+
+              <div className="flex justify-between items-center mb-5">
+
+                <div>
+
+                  <p className="text-yellow-400 font-bold">
+                    {item.restaurant_name}
+                  </p>
+
+                  <p className="text-gray-400 text-sm">
+                    🚚 {item.delivery_time}
+                  </p>
+
+                </div>
+
+                <span className="bg-yellow-400 text-black px-3 py-1 rounded-full font-bold">
+                  ⭐ {item.rating}
+                </span>
+
+              </div>
 
               {/* CATEGORY + BUTTON */}
 
@@ -249,7 +315,7 @@ const Menu = () => {
 
       </div>
 
-      {/* NO ITEMS FOUND */}
+      {/* NO ITEMS */}
 
       {filteredMenu.length === 0 && (
 
@@ -263,15 +329,15 @@ const Menu = () => {
 
       )}
 
-      {/* FOOD DETAILS MODAL */}
+      {/* MODAL */}
 
       {selectedItem && (
 
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6 overflow-y-auto">
 
-          <div className="bg-slate-900 max-w-2xl w-full rounded-3xl overflow-hidden shadow-2xl relative">
+          <div className="bg-slate-900 max-w-3xl w-full rounded-3xl overflow-hidden shadow-2xl relative">
 
-            {/* CLOSE BUTTON */}
+            {/* CLOSE */}
 
             <button
               onClick={() => setSelectedItem(null)}
@@ -292,6 +358,8 @@ const Menu = () => {
 
             <div className="p-8">
 
+              {/* TITLE */}
+
               <div className="flex justify-between items-center mb-4">
 
                 <h2 className="text-4xl font-bold text-yellow-400">
@@ -304,11 +372,155 @@ const Menu = () => {
 
               </div>
 
+              {/* DESCRIPTION */}
+
               <p className="text-gray-300 text-lg mb-6 leading-relaxed">
                 {selectedItem.description}
               </p>
 
-              <div className="flex justify-between items-center">
+              {/* RESTAURANT */}
+
+              <div className="flex justify-between items-center mb-8">
+
+                <div>
+
+                  <p className="text-yellow-400 font-bold text-lg">
+                    {selectedItem.restaurant_name}
+                  </p>
+
+                  <p className="text-gray-400">
+                    🚚 {selectedItem.delivery_time}
+                  </p>
+
+                </div>
+
+                <span className="bg-yellow-400 text-black px-4 py-2 rounded-full font-bold">
+                  ⭐ {selectedItem.rating}
+                </span>
+
+              </div>
+
+              {/* REVIEWS */}
+
+              <div className="mt-10">
+
+                <h3 className="text-3xl font-bold text-yellow-400 mb-6">
+                  Customer Reviews
+                </h3>
+
+                <div className="space-y-4 mb-8">
+
+                  {reviews
+                    .filter(
+                      (review) =>
+                        review.food_name === selectedItem.name
+                    )
+                    .map((review) => (
+
+                      <div
+                        key={review.id}
+                        className="bg-black/40 border border-slate-700 p-5 rounded-2xl"
+                      >
+
+                        <div className="flex justify-between items-center mb-3">
+
+                          <h4 className="text-xl font-bold text-white">
+                            {review.customer_name}
+                          </h4>
+
+                          <span className="bg-yellow-400 text-black px-3 py-1 rounded-full font-bold">
+                            ⭐ {review.rating}
+                          </span>
+
+                        </div>
+
+                        <p className="text-gray-300">
+                          {review.comment}
+                        </p>
+
+                      </div>
+
+                    ))}
+
+                </div>
+
+                {/* ADD REVIEW */}
+
+                <div className="bg-black/40 border border-slate-700 rounded-3xl p-6">
+
+                  <h3 className="text-2xl font-bold text-yellow-400 mb-6">
+                    Add Review
+                  </h3>
+
+                  <div className="space-y-5">
+
+                    {/* NAME */}
+
+                    <input
+                      type="text"
+                      placeholder="Your Name"
+                      value={reviewForm.customer_name}
+                      onChange={(e) =>
+                        setReviewForm({
+                          ...reviewForm,
+                          customer_name: e.target.value,
+                        })
+                      }
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white outline-none focus:border-yellow-400"
+                    />
+
+                    {/* RATING */}
+
+                    <select
+                      value={reviewForm.rating}
+                      onChange={(e) =>
+                        setReviewForm({
+                          ...reviewForm,
+                          rating: e.target.value,
+                        })
+                      }
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white outline-none focus:border-yellow-400"
+                    >
+                      <option value="5">⭐ 5</option>
+                      <option value="4">⭐ 4</option>
+                      <option value="3">⭐ 3</option>
+                      <option value="2">⭐ 2</option>
+                      <option value="1">⭐ 1</option>
+                    </select>
+
+                    {/* COMMENT */}
+
+                    <textarea
+                      rows="4"
+                      placeholder="Write your review..."
+                      value={reviewForm.comment}
+                      onChange={(e) =>
+                        setReviewForm({
+                          ...reviewForm,
+                          comment: e.target.value,
+                        })
+                      }
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white outline-none focus:border-yellow-400"
+                    />
+
+                    {/* SUBMIT */}
+
+                    <button
+                      onClick={handleReviewSubmit}
+                      className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-4 rounded-2xl text-xl font-bold transition duration-300"
+                    >
+                      Submit Review
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* CATEGORY + CART */}
+
+              <div className="flex justify-between items-center mt-10">
 
                 <span className="bg-yellow-400 text-black px-5 py-2 rounded-full font-bold">
                   {selectedItem.category}
