@@ -9,6 +9,7 @@ const authRoutes = require("./routes/authRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 const orderRoutes=require("./routes/orderRoutes");
 const reviewRoutes=require("./routes/reviewRoutes");
+const adminRoutes=require("./routes/adminRoutes");
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/api/menu", menuRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews",reviewRoutes);
+app.use("/api/admin",adminRoutes);
 
 app.get("/", async (req, res) => {
   try {

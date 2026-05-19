@@ -3,82 +3,166 @@ const express = require("express");
 const router = express.Router();
 
 const pool = require("../config/db");
+const adminAuth =
+  require("../middleware/adminAuth");
 
+// GET ALL MENU ITEMS
 
-// GET MENU
 router.get("/", async (req, res) => {
+
   try {
 
-    const menuItems = await pool.query(
-      "SELECT * FROM menu ORDER BY id ASC"
+    const menu = await pool.query(
+      "SELECT * FROM menu ORDER BY id DESC"
     );
 
-    res.status(200).json(menuItems.rows);
+    res.json(menu.rows);
 
   } catch (error) {
 
     console.log(error);
 
     res.status(500).json({
-      message: "Server error",
+      message: "Failed to fetch menu",
     });
 
   }
+
 });
 
+// ADD FOOD ITEM
 
-// ADD MENU ITEM
-router.post("/", async (req, res) => {
+router.post("/", adminAuth,
+  async (req, res) => {
+
   try {
 
     const {
       name,
       description,
       price,
-      image,
       category,
+      restaurant_name,
+      delivery_time,
+      rating,
+      image,
     } = req.body;
 
-    const newItem = await pool.query(
+    const newFood = await pool.query(
       `
       INSERT INTO menu
-      (name, description, price, image, category)
-      VALUES ($1, $2, $3, $4, $5)
+      (
+        name,
+        description,
+        price,
+        category,
+        restaurant_name,
+        delivery_time,
+        rating,
+        image
+      )
+      VALUES
+      ($1,$2,$3,$4,$5,$6,$7,$8)
       RETURNING *
       `,
-      [name, description, price, image, category]
+      [
+        name,
+        description,
+        price,
+        category,
+        restaurant_name,
+        delivery_time,
+        rating,
+        image,
+      ]
     );
 
-    res.status(201).json({
-      message: "Menu item added",
-      item: newItem.rows[0],
-    });
+    res.json(newFood.rows[0]);
 
   } catch (error) {
 
     console.log(error);
 
     res.status(500).json({
-      message: "Server error",
+      message: "Failed to add food",
     });
 
   }
+
 });
 
+// UPDATE FOOD ITEM
 
-// DELETE MENU ITEM
-router.delete("/:id", async (req, res) => {
+router.put("/:id",adminAuth, async (req, res) => {
+
   try {
 
-    const { id } = req.params;
+    const {
+      name,
+      description,
+      price,
+      category,
+      restaurant_name,
+      delivery_time,
+      rating,
+      image,
+    } = req.body;
+
+    const updatedFood = await pool.query(
+      `
+      UPDATE menu
+      SET
+        name = $1,
+        description = $2,
+        price = $3,
+        category = $4,
+        restaurant_name = $5,
+        delivery_time = $6,
+        rating = $7,
+        image = $8
+      WHERE id = $9
+      RETURNING *
+      `,
+      [
+        name,
+        description,
+        price,
+        category,
+        restaurant_name,
+        delivery_time,
+        rating,
+        image,
+        req.params.id,
+      ]
+    );
+
+    res.json(updatedFood.rows[0]);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Failed to update food item",
+    });
+
+  }
+
+});
+
+// DELETE FOOD ITEM
+
+router.delete("/:id",adminAuth, async (req, res) => {
+
+  try {
 
     await pool.query(
       "DELETE FROM menu WHERE id = $1",
-      [id]
+      [req.params.id]
     );
 
-    res.status(200).json({
-      message: "Menu item deleted",
+    res.json({
+      message: "Food deleted successfully",
     });
 
   } catch (error) {
@@ -86,10 +170,11 @@ router.delete("/:id", async (req, res) => {
     console.log(error);
 
     res.status(500).json({
-      message: "Server error",
+      message: "Failed to delete food",
     });
 
   }
+
 });
 
 module.exports = router;
