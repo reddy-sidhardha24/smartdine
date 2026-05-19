@@ -29,7 +29,7 @@ const adminAuth = (req, res, next) => {
 
     const verified = jwt.verify(
       token,
-      "smartdine_secret_key"
+      process.env.JWT_SECRET
     );
 
     // SAVE ADMIN DATA

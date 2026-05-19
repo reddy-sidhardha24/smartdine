@@ -2,58 +2,62 @@ import { useState } from "react";
 
 import axios from "axios";
 
+import { toast } from "react-toastify";
+
 import { useNavigate } from "react-router-dom";
 
-import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const AdminLogin = () => {
 
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const { loginAdmin } = useAuth();
 
-  const [password, setPassword] =
-    useState("");
+  // FORM STATE
+
+  const [formData, setFormData] =
+    useState({
+      email: "",
+      password: "",
+    });
+
+  // LOADING
 
   const [loading, setLoading] =
     useState(false);
 
-  // LOGIN FUNCTION
+  // HANDLE CHANGE
+
+  const handleChange = (e) => {
+
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+
+  };
+
+  // HANDLE LOGIN
 
   const handleLogin = async (e) => {
 
     e.preventDefault();
 
-    if (!email || !password) {
-
-      toast.error("Please fill all fields");
-
-      return;
-
-    }
+    setLoading(true);
 
     try {
 
-      setLoading(true);
-
       const res = await axios.post(
         "http://localhost:5000/api/admin/login",
-        {
-          email,
-          password,
-        }
+        formData
       );
 
-      // SAVE TOKEN
+      // CONTEXT LOGIN
 
-      localStorage.setItem(
-        "adminToken",
-        res.data.token
-      );
-
-      localStorage.setItem(
-        "adminData",
-        JSON.stringify(res.data.admin)
+      loginAdmin(
+        res.data.token,
+        res.data.admin
       );
 
       toast.success(
@@ -70,7 +74,7 @@ const AdminLogin = () => {
 
       toast.error(
         error.response?.data?.message ||
-          "Login failed"
+        "Login failed"
       );
 
     } finally {
@@ -82,7 +86,8 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-6">
+
+    <div className="min-h-screen bg-black flex justify-center items-center px-6">
 
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-10 shadow-2xl">
 
@@ -94,7 +99,7 @@ const AdminLogin = () => {
 
         </h1>
 
-        <p className="text-center text-gray-400 text-lg mb-10">
+        <p className="text-center text-gray-400 mb-10 text-lg">
 
           Admin Authentication Portal
 
@@ -104,14 +109,14 @@ const AdminLogin = () => {
 
         <form
           onSubmit={handleLogin}
-          className="space-y-6"
+          className="space-y-7"
         >
 
           {/* EMAIL */}
 
           <div>
 
-            <label className="block mb-3 text-lg font-bold text-white">
+            <label className="block text-lg font-semibold mb-3">
 
               Email
 
@@ -119,12 +124,12 @@ const AdminLogin = () => {
 
             <input
               type="email"
+              name="email"
               placeholder="Enter admin email"
-              value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none focus:border-yellow-400"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none focus:border-yellow-400"
+              required
             />
 
           </div>
@@ -133,7 +138,7 @@ const AdminLogin = () => {
 
           <div>
 
-            <label className="block mb-3 text-lg font-bold text-white">
+            <label className="block text-lg font-semibold mb-3">
 
               Password
 
@@ -141,12 +146,12 @@ const AdminLogin = () => {
 
             <input
               type="password"
+              name="password"
               placeholder="Enter password"
-              value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
-              }
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none focus:border-yellow-400"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none focus:border-yellow-400"
+              required
             />
 
           </div>
@@ -156,11 +161,11 @@ const AdminLogin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-4 rounded-2xl text-xl font-bold transition duration-300"
+            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 rounded-2xl text-xl transition duration-300"
           >
 
             {loading
-              ? "Logging In..."
+              ? "Logging in..."
               : "Admin Login"}
 
           </button>
@@ -169,7 +174,7 @@ const AdminLogin = () => {
 
         {/* TEST CREDENTIALS */}
 
-        <div className="mt-10 bg-slate-800 rounded-2xl p-5">
+        <div className="mt-10 bg-slate-800 rounded-2xl p-5 border border-slate-700">
 
           <h3 className="text-yellow-400 font-bold mb-3">
 
@@ -180,17 +185,16 @@ const AdminLogin = () => {
           <p className="text-gray-300">
 
             Email:
-            <span className="text-white ml-2">
-              admin@smartdine.com
-            </span>
+            {" "}
+            admin@smartdine.com
+
           </p>
 
           <p className="text-gray-300 mt-2">
 
             Password:
-            <span className="text-white ml-2">
-              admin123
-            </span>
+            {" "}
+            admin123
 
           </p>
 
@@ -199,7 +203,9 @@ const AdminLogin = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 export default AdminLogin;

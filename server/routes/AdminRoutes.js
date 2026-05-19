@@ -71,7 +71,7 @@ router.post("/login", async (req, res) => {
         email: admin.rows[0].email,
         role: "admin",
       },
-      "smartdine_secret_key",
+      process.env.JWT_SECRET,
       {
         expiresIn: "7d",
       }

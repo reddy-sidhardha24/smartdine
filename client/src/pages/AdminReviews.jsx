@@ -1,127 +1,81 @@
-import { useEffect, useState } from "react";
-
-import axios from "axios";
-
-import { toast } from "react-toastify";
+// ==============================
+// ADMINREVIEWS.JSX
+// ==============================
 
 const AdminReviews = () => {
 
-  const [reviews, setReviews] = useState([]);
+  const reviews = [
 
-  // FETCH REVIEWS
+    {
+      id: 1,
+      user: "Rahul",
+      food: "Chicken Biryani",
+      rating: 5,
+      review:
+        "Amazing taste and fast delivery.",
+    },
 
-  const fetchReviews = async () => {
+    {
+      id: 2,
+      user: "Sneha",
+      food: "Paneer Pizza",
+      rating: 4,
+      review:
+        "Loved the cheese and quality.",
+    },
 
-    try {
-
-      const res = await axios.get(
-        "http://localhost:5000/api/reviews"
-      );
-
-      setReviews(res.data);
-
-    } catch (error) {
-
-      console.log(error);
-
-      toast.error("Failed to fetch reviews");
-
-    }
-
-  };
-
-  useEffect(() => {
-
-    fetchReviews();
-
-  }, []);
-
-  // DELETE REVIEW
-
-  const deleteReview = async (id) => {
-
-    try {
-
-      await axios.delete(
-        `http://localhost:5000/api/reviews/${id}`
-      );
-
-      toast.success("Review deleted");
-
-      fetchReviews();
-
-    } catch (error) {
-
-      console.log(error);
-
-      toast.error("Failed to delete review");
-
-    }
-
-  };
+  ];
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-12">
 
-      {/* TITLE */}
+    <div className="min-h-screen bg-black text-white px-6 lg:px-20 py-14">
 
-      <h1 className="text-5xl font-extrabold text-center text-yellow-400 mb-14">
-        Admin Review Management
+      <h1 className="text-5xl font-extrabold text-yellow-400 text-center mb-14">
+
+        Customer Reviews
+
       </h1>
 
-      {/* REVIEWS */}
+      <div className="grid md:grid-cols-2 gap-10">
 
-      <div className="max-w-7xl mx-auto space-y-8">
-
-        {reviews.map((review) => (
+        {reviews.map((item) => (
 
           <div
-            key={review.id}
+            key={item.id}
             className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl"
           >
 
-            {/* HEADER */}
-
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+            <div className="flex justify-between items-center mb-5">
 
               <div>
 
-                <h2 className="text-3xl font-bold text-yellow-400">
-                  {review.food_name}
+                <h2 className="text-3xl font-bold">
+
+                  {item.user}
+
                 </h2>
 
-                <p className="text-gray-400 mt-2">
-                  By {review.customer_name}
+                <p className="text-gray-400">
+
+                  {item.food}
+
                 </p>
 
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="bg-yellow-400 text-black px-4 py-2 rounded-full font-bold">
 
-                <span className="bg-yellow-400 text-black px-5 py-2 rounded-full font-bold text-lg">
-                  ⭐ {review.rating}
-                </span>
-
-                <button
-                  onClick={() => deleteReview(review.id)}
-                  className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl font-bold"
-                >
-                  Delete
-                </button>
+                ⭐ {item.rating}
 
               </div>
 
             </div>
 
-            {/* COMMENT */}
+            <p className="text-gray-300 text-lg leading-relaxed">
 
-            <div className="bg-black/40 border border-slate-700 rounded-2xl p-6">
+              {item.review}
 
-              <p className="text-lg text-gray-300 leading-relaxed">
-                {review.comment}
-              </p>
-
-            </div>
+            </p>
 
           </div>
 
@@ -130,7 +84,9 @@ const AdminReviews = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 export default AdminReviews;

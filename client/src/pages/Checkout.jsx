@@ -1,318 +1,169 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect } from "react";
 
-import axios from "axios";
+import { CartContext } from "../context/CartContext";
 
 import { useNavigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
-import { CartContext } from "../context/CartContext";
-
 const Checkout = () => {
+
+  const navigate = useNavigate();
 
   const {
     cartItems,
     clearCart,
   } = useContext(CartContext);
 
-  const navigate = useNavigate();
+  // USER AUTH CHECK
 
-  const [name, setName] = useState("");
+  useEffect(() => {
 
-  const [phone, setPhone] = useState("");
+    const userToken =
+      localStorage.getItem("token");
 
-  const [address, setAddress] = useState("");
+    if (!userToken) {
 
-  const [paymentMethod, setPaymentMethod] = useState("COD");
+      toast.error(
+        "Please login first"
+      );
+
+      navigate("/login");
+
+    }
+
+  }, []);
 
   // TOTAL PRICE
 
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + item.price,
-    0
-  );
+  const totalPrice =
+    cartItems.reduce(
 
-  // CHECKOUT FUNCTION
+      (total, item) =>
 
-  const handleCheckout = async () => {
+        total +
+        item.price * item.quantity,
 
-    // NAME VALIDATION
+      0
 
-    if (!name.trim()) {
+    );
 
-      toast.error("Name is required");
+  // PLACE ORDER
 
-      return;
+  const placeOrder = () => {
 
-    }
+    toast.success(
+      "Order placed successfully!"
+    );
 
-    // PHONE VALIDATION
+    clearCart();
 
-    const phoneRegex = /^[0-9]{10}$/;
-
-    if (!phoneRegex.test(phone)) {
-
-      toast.error(
-        "Enter valid 10-digit phone number"
-      );
-
-      return;
-
-    }
-
-    // ADDRESS VALIDATION
-
-    if (address.trim().length < 10) {
-
-      toast.error(
-        "Address must contain at least 10 characters"
-      );
-
-      return;
-
-    }
-
-    // PAYMENT VALIDATION
-
-    if (!paymentMethod) {
-
-      toast.error(
-        "Please select payment method"
-      );
-
-      return;
-
-    }
-
-    // EMPTY CART VALIDATION
-
-    if (cartItems.length === 0) {
-
-      toast.error("Cart is empty");
-
-      return;
-
-    }
-
-    try {
-
-      const token = localStorage.getItem("token");
-
-      await axios.post(
-        "http://localhost:5000/api/orders",
-        {
-          items: cartItems,
-          total: totalPrice,
-          address,
-          phone,
-          paymentMethod,
-          customerName: name,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      toast.success(
-        "Order placed successfully"
-      );
-
-      clearCart();
-
-      navigate("/orders");
-
-    } catch (error) {
-
-      console.log(error);
-
-      toast.error("Checkout failed");
-
-    }
+    navigate("/orders");
 
   };
 
   return (
+
     <div className="min-h-screen bg-black text-white px-6 py-12">
 
-      {/* PAGE TITLE */}
+      <h1 className="text-5xl font-bold text-yellow-400 mb-10">
 
-      <h1 className="text-5xl font-extrabold text-center text-yellow-400 mb-14">
         Checkout
+
       </h1>
 
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12">
+      {cartItems.length === 0 ? (
 
-        {/* LEFT SECTION */}
+        <div className="text-center mt-20">
 
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
+          <h2 className="text-3xl font-bold">
 
-          <h2 className="text-3xl font-bold text-yellow-400 mb-8">
-            Delivery Details
+            Cart is Empty
+
           </h2>
-
-          <div className="space-y-6">
-
-            {/* NAME */}
-
-            <div>
-
-              <label className="block mb-2 text-lg font-semibold">
-                Full Name
-              </label>
-
-              <input
-                type="text"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none focus:border-yellow-400"
-              />
-
-            </div>
-
-            {/* PHONE */}
-
-            <div>
-
-              <label className="block mb-2 text-lg font-semibold">
-                Phone Number
-              </label>
-
-              <input
-                type="text"
-                placeholder="Enter phone number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none focus:border-yellow-400"
-              />
-
-            </div>
-
-            {/* ADDRESS */}
-
-            <div>
-
-              <label className="block mb-2 text-lg font-semibold">
-                Delivery Address
-              </label>
-
-              <textarea
-                rows="5"
-                placeholder="Enter complete delivery address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none focus:border-yellow-400"
-              />
-
-            </div>
-
-            {/* PAYMENT */}
-
-            <div>
-
-              <label className="block mb-2 text-lg font-semibold">
-                Payment Method
-              </label>
-
-              <select
-                value={paymentMethod}
-                onChange={(e) =>
-                  setPaymentMethod(e.target.value)
-                }
-                className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none focus:border-yellow-400"
-              >
-                <option value="COD">
-                  Cash on Delivery
-                </option>
-
-                <option value="UPI">
-                  UPI Payment
-                </option>
-
-                <option value="Card">
-                  Credit / Debit Card
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
 
         </div>
 
-        {/* RIGHT SECTION */}
+      ) : (
 
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl h-fit">
+        <div className="grid gap-6">
 
-          <h2 className="text-3xl font-bold text-yellow-400 mb-8">
-            Order Summary
-          </h2>
+          {cartItems.map((item) => (
 
-          {/* CART ITEMS */}
+            <div
+              key={item.id}
+              className="bg-slate-900 p-5 rounded-2xl flex justify-between items-center"
+            >
 
-          <div className="space-y-5 mb-10 max-h-[400px] overflow-y-auto pr-2">
+              <div className="flex items-center gap-5">
 
-            {cartItems.map((item, index) => (
-
-              <div
-                key={index}
-                className="flex justify-between items-center bg-black/40 border border-slate-700 rounded-2xl p-4"
-              >
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-24 h-24 rounded-xl object-cover"
+                />
 
                 <div>
 
-                  <h3 className="text-xl font-bold text-white">
-                    {item.name}
-                  </h3>
+                  <h2 className="text-2xl font-bold">
 
-                  <p className="text-gray-400 mt-1">
-                    {item.restaurant_name}
+                    {item.name}
+
+                  </h2>
+
+                  <p className="text-yellow-400 text-xl">
+
+                    ₹{item.price}
+
+                  </p>
+
+                  <p className="text-gray-400">
+
+                    Quantity:
+                    {" "}
+                    {item.quantity}
+
                   </p>
 
                 </div>
 
-                <p className="text-yellow-400 text-xl font-bold">
-                  ₹{item.price}
-                </p>
-
               </div>
 
-            ))}
+            </div>
 
-          </div>
+          ))}
 
           {/* TOTAL */}
 
-          <div className="flex justify-between items-center mb-10 border-t border-slate-700 pt-6">
+          <div className="bg-slate-900 p-6 rounded-2xl">
 
-            <h3 className="text-3xl font-bold">
-              Total
-            </h3>
+            <h2 className="text-3xl font-bold text-yellow-400 mb-5">
 
-            <p className="text-4xl font-extrabold text-green-400">
+              Total:
+              {" "}
               ₹{totalPrice}
-            </p>
+
+            </h2>
+
+            <button
+              onClick={placeOrder}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-4 rounded-xl font-bold text-lg"
+            >
+
+              Place Order
+
+            </button>
 
           </div>
 
-          {/* PLACE ORDER BUTTON */}
-
-          <button
-            onClick={handleCheckout}
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-5 rounded-2xl text-2xl font-bold transition duration-300"
-          >
-            Place Order
-          </button>
-
         </div>
 
-      </div>
+      )}
 
     </div>
+
   );
+
 };
 
 export default Checkout;

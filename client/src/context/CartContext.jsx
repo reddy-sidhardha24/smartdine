@@ -1,32 +1,99 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 export const CartContext = createContext();
 
-const CartProvider = ({ children }) => {
+export const CartProvider = ({ children }) => {
 
-  const [cartItems, setCartItems] = useState([]);
+  // LOAD CART FROM LOCAL STORAGE
 
-  // ADD ITEM
+  const [cartItems, setCartItems] = useState(() => {
+
+    const storedCart =
+      localStorage.getItem("cart");
+
+    return storedCart
+      ? JSON.parse(storedCart)
+      : [];
+
+  });
+
+  // SAVE TO LOCAL STORAGE
+
+  useEffect(() => {
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(cartItems)
+    );
+
+  }, [cartItems]);
+
+  // ADD TO CART
+
   const addToCart = (item) => {
-    setCartItems([...cartItems, item]);
+
+    const existingItem =
+      cartItems.find(
+        (cartItem) =>
+          cartItem.id === item.id
+      );
+
+    if (existingItem) {
+
+      setCartItems(
+
+        cartItems.map((cartItem) =>
+
+          cartItem.id === item.id
+
+            ? {
+                ...cartItem,
+                quantity:
+                  cartItem.quantity + 1,
+              }
+
+            : cartItem
+        )
+      );
+
+    } else {
+
+      setCartItems([
+        ...cartItems,
+        {
+          ...item,
+          quantity: 1,
+        },
+      ]);
+
+    }
+
   };
 
-  // REMOVE ITEM
-  const removeFromCart = (index) => {
+  // REMOVE FROM CART
 
-    const updatedCart = [...cartItems];
+  const removeFromCart = (id) => {
 
-    updatedCart.splice(index, 1);
+    setCartItems(
 
-    setCartItems(updatedCart);
+      cartItems.filter(
+        (item) => item.id !== id
+      )
+
+    );
+
   };
 
   // CLEAR CART
+
   const clearCart = () => {
+
     setCartItems([]);
+
   };
 
   return (
+
     <CartContext.Provider
       value={{
         cartItems,
@@ -35,9 +102,11 @@ const CartProvider = ({ children }) => {
         clearCart,
       }}
     >
-      {children}
-    </CartContext.Provider>
-  );
-};
 
-export default CartProvider;
+      {children}
+
+    </CartContext.Provider>
+
+  );
+
+};

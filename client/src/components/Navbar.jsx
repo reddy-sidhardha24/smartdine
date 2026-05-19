@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-
 import { useState } from "react";
 
 import {
@@ -15,32 +14,34 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] =
     useState(false);
 
-  // CHECK ADMIN LOGIN
+  // ADMIN DATA
+
+  const adminData =
+    localStorage.getItem("adminData")
+      ? JSON.parse(
+          localStorage.getItem(
+            "adminData"
+          )
+        )
+      : null;
+
+  // TOKENS
+
+  const userToken =
+    localStorage.getItem("token");
 
   const adminToken =
-    localStorage.getItem("adminToken");
+    localStorage.getItem(
+      "adminToken"
+    );
 
-  // ACTIVE NAV STYLE
+  // ACTIVE NAV LINK
 
   const navLink = (path) => {
 
     return location.pathname === path
       ? "text-yellow-400 font-bold"
       : "text-white hover:text-yellow-400";
-
-  };
-
-  // LOGOUT FUNCTION
-
-  const handleLogout = () => {
-
-    localStorage.removeItem("adminToken");
-
-    localStorage.removeItem("adminData");
-
-    localStorage.removeItem("token");
-
-    window.location.href = "/admin-login";
 
   };
 
@@ -63,7 +64,7 @@ const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-8 text-lg">
 
-          {/* HOME */}
+          {/* PUBLIC LINKS */}
 
           <Link
             to="/"
@@ -72,8 +73,6 @@ const Navbar = () => {
             Home
           </Link>
 
-          {/* MENU */}
-
           <Link
             to="/menu"
             className={navLink("/menu")}
@@ -81,16 +80,12 @@ const Navbar = () => {
             Menu
           </Link>
 
-          {/* ORDERS */}
-
           <Link
             to="/orders"
             className={navLink("/orders")}
           >
             Orders
           </Link>
-
-          {/* CAREERS */}
 
           <Link
             to="/careers"
@@ -101,7 +96,8 @@ const Navbar = () => {
 
           {/* ADMIN LINKS */}
 
-          {adminToken && (
+          {adminData && (
+
             <>
 
               <Link
@@ -133,33 +129,76 @@ const Navbar = () => {
               </Link>
 
             </>
+
           )}
 
           {/* CART */}
 
-          <Link
-            to="/cart"
-            className="relative"
-          >
-            <FaShoppingCart className="text-2xl text-yellow-400" />
-          </Link>
-
-          {/* LOGIN / LOGOUT */}
-
-          {!adminToken ? (
+          {(userToken || adminToken) && (
 
             <Link
-              to="/admin-login"
-              className="bg-yellow-400 hover:bg-yellow-500 px-5 py-2 rounded-xl font-bold text-black transition duration-300"
+              to="/cart"
+              className="relative"
             >
-              Admin Login
+              <FaShoppingCart className="text-2xl text-yellow-400" />
             </Link>
 
-          ) : (
+          )}
+
+          {/* LOGIN BUTTONS */}
+
+          {!userToken && !adminToken && (
+
+            <>
+
+              <Link
+                to="/login"
+                className="text-white hover:text-yellow-400"
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/register"
+                className="bg-yellow-400 text-black px-4 py-2 rounded-xl font-semibold hover:bg-yellow-300"
+              >
+                Register
+              </Link>
+
+              <Link
+                to="/admin-login"
+                className="bg-red-500 px-4 py-2 rounded-xl font-semibold hover:bg-red-600"
+              >
+                Admin Login
+              </Link>
+
+            </>
+
+          )}
+
+          {/* LOGOUT */}
+
+          {(userToken || adminToken) && (
 
             <button
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl font-semibold text-white transition duration-300"
+              onClick={() => {
+
+                localStorage.removeItem(
+                  "token"
+                );
+
+                localStorage.removeItem(
+                  "adminToken"
+                );
+
+                localStorage.removeItem(
+                  "adminData"
+                );
+
+                window.location.href = "/";
+
+              }}
+              className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl font-semibold"
             >
               Logout
             </button>
@@ -176,11 +215,9 @@ const Navbar = () => {
             setMenuOpen(!menuOpen)
           }
         >
-
           {menuOpen
             ? <FaTimes />
             : <FaBars />}
-
         </button>
 
       </div>
@@ -190,8 +227,6 @@ const Navbar = () => {
       {menuOpen && (
 
         <div className="md:hidden bg-slate-950 border-t border-slate-800 px-6 py-6 space-y-5 text-lg">
-
-          {/* HOME */}
 
           <Link
             to="/"
@@ -203,8 +238,6 @@ const Navbar = () => {
             Home
           </Link>
 
-          {/* MENU */}
-
           <Link
             to="/menu"
             className={`block ${navLink("/menu")}`}
@@ -214,8 +247,6 @@ const Navbar = () => {
           >
             Menu
           </Link>
-
-          {/* ORDERS */}
 
           <Link
             to="/orders"
@@ -227,8 +258,6 @@ const Navbar = () => {
             Orders
           </Link>
 
-          {/* CAREERS */}
-
           <Link
             to="/careers"
             className={`block ${navLink("/careers")}`}
@@ -239,9 +268,10 @@ const Navbar = () => {
             Careers
           </Link>
 
-          {/* ADMIN LINKS */}
+          {/* ADMIN MOBILE LINKS */}
 
-          {adminToken && (
+          {adminData && (
+
             <>
 
               <Link
@@ -285,39 +315,88 @@ const Navbar = () => {
               </Link>
 
             </>
+
           )}
 
           {/* CART */}
 
-          <Link
-            to="/cart"
-            className="block text-yellow-400"
-            onClick={() =>
-              setMenuOpen(false)
-            }
-          >
-            Cart
-          </Link>
-
-          {/* LOGIN / LOGOUT */}
-
-          {!adminToken ? (
+          {(userToken || adminToken) && (
 
             <Link
-              to="/admin-login"
-              className="block bg-yellow-400 hover:bg-yellow-500 py-3 rounded-xl font-bold text-black text-center"
+              to="/cart"
+              className="block text-yellow-400"
               onClick={() =>
                 setMenuOpen(false)
               }
             >
-              Admin Login
+              Cart
             </Link>
 
-          ) : (
+          )}
+
+          {/* LOGIN BUTTONS */}
+
+          {!userToken && !adminToken && (
+
+            <>
+
+              <Link
+                to="/login"
+                className="block text-white"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/register"
+                className="block text-yellow-400"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
+                Register
+              </Link>
+
+              <Link
+                to="/admin-login"
+                className="block text-red-400"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
+                Admin Login
+              </Link>
+
+            </>
+
+          )}
+
+          {/* LOGOUT */}
+
+          {(userToken || adminToken) && (
 
             <button
-              onClick={handleLogout}
-              className="w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl font-semibold text-white"
+              onClick={() => {
+
+                localStorage.removeItem(
+                  "token"
+                );
+
+                localStorage.removeItem(
+                  "adminToken"
+                );
+
+                localStorage.removeItem(
+                  "adminData"
+                );
+
+                window.location.href = "/";
+
+              }}
+              className="w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl font-semibold"
             >
               Logout
             </button>

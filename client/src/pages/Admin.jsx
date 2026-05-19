@@ -2,14 +2,11 @@ import { useEffect, useState } from "react";
 
 import axios from "axios";
 
+import api from "../api/axios";
+
 import { toast } from "react-toastify";
 
 const Admin = () => {
-
-  // ADMIN TOKEN
-
-  const adminToken =
-    localStorage.getItem("adminToken");
 
   // STATES
 
@@ -37,15 +34,18 @@ const Admin = () => {
 
     try {
 
-      const res = await axios.get(
-        "http://localhost:5000/api/menu"
-      );
+      const res =
+        await api.get("/menu");
 
       setMenuItems(res.data);
 
     } catch (error) {
 
       console.log(error);
+
+      toast.error(
+        "Failed to fetch menu"
+      );
 
     }
 
@@ -57,147 +57,150 @@ const Admin = () => {
 
   }, []);
 
-  // HANDLE CHANGE
+  // HANDLE INPUT CHANGE
 
   const handleChange = (e) => {
 
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.value,
     });
 
   };
 
-  // HANDLE IMAGE UPLOAD
+  // IMAGE UPLOAD
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload =
+    async (e) => {
 
-    const file = e.target.files[0];
+      const file =
+        e.target.files[0];
 
-    if (!file) return;
+      if (!file) return;
 
-    const data = new FormData();
+      const data =
+        new FormData();
 
-    data.append("file", file);
-
-    data.append(
-      "upload_preset",
-      "smartdine_upload"
-    );
-
-    try {
-
-      const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/dcgvza4bu/image/upload",
-        data
+      data.append(
+        "file",
+        file
       );
 
-      setFormData({
-        ...formData,
-        image: res.data.secure_url,
-      });
-
-      toast.success(
-        "Image uploaded successfully"
+      data.append(
+        "upload_preset",
+        "smartdine_upload"
       );
 
-    } catch (error) {
+      try {
 
-      console.log(error);
+        const res =
+          await axios.post(
+            "https://api.cloudinary.com/v1_1/dcgvza4bu/image/upload",
+            data
+          );
 
-      toast.error(
-        "Image upload failed"
-      );
+        setFormData({
+          ...formData,
+          image:
+            res.data.secure_url,
+        });
 
-    }
+        toast.success(
+          "Image uploaded successfully"
+        );
 
-  };
+      } catch (error) {
+
+        console.log(error);
+
+        toast.error(
+          "Image upload failed"
+        );
+
+      }
+
+    };
 
   // ADD FOOD
 
-  const handleAddFood = async (e) => {
+  const handleAddFood =
+    async (e) => {
 
-    e.preventDefault();
+      e.preventDefault();
 
-    try {
+      try {
 
-      await axios.post(
-        "http://localhost:5000/api/menu",
-        formData,
-        {
-          headers: {
-            Authorization:
-              `Bearer ${adminToken}`,
-          },
-        }
-      );
+        await api.post(
+          "/menu",
+          formData
+        );
 
-      toast.success(
-        "Food item added successfully"
-      );
+        toast.success(
+          "Food item added successfully"
+        );
 
-      setFormData({
-        name: "",
-        price: "",
-        category: "",
-        restaurant: "",
-        deliverytime: "",
-        rating: "",
-        description: "",
-        image: "",
-      });
+        // RESET FORM
 
-      fetchMenu();
+        setFormData({
+          name: "",
+          price: "",
+          category: "",
+          restaurant: "",
+          deliverytime: "",
+          rating: "",
+          description: "",
+          image: "",
+        });
 
-    } catch (error) {
+        fetchMenu();
 
-      console.log(error);
+      } catch (error) {
 
-      toast.error(
-        "Failed to add food item"
-      );
+        console.log(error);
 
-    }
+        toast.error(
+          "Failed to add food item"
+        );
 
-  };
+      }
+
+    };
 
   // DELETE FOOD
 
-  const handleDelete = async (id) => {
+  const handleDelete =
+    async (id) => {
 
-    try {
+      try {
 
-      await axios.delete(
-        `http://localhost:5000/api/menu/${id}`,
-        {
-          headers: {
-            Authorization:
-              `Bearer ${adminToken}`,
-          },
-        }
-      );
+        await api.delete(
+          `/menu/${id}`
+        );
 
-      toast.success(
-        "Food item deleted"
-      );
+        toast.success(
+          "Food item deleted"
+        );
 
-      fetchMenu();
+        fetchMenu();
 
-    } catch (error) {
+      } catch (error) {
 
-      console.log(error);
+        console.log(error);
 
-      toast.error(
-        "Delete failed"
-      );
+        toast.error(
+          "Delete failed"
+        );
 
-    }
+      }
 
-  };
+    };
 
   // EDIT FOOD
 
-  const handleEdit = (item) => {
+  const handleEdit = (
+    item
+  ) => {
 
     setEditId(item.id);
 
@@ -205,10 +208,13 @@ const Admin = () => {
       name: item.name,
       price: item.price,
       category: item.category,
-      restaurant: item.restaurant,
-      deliverytime: item.deliverytime,
+      restaurant:
+        item.restaurant,
+      deliverytime:
+        item.deliverytime,
       rating: item.rating,
-      description: item.description,
+      description:
+        item.description,
       image: item.image,
     });
 
@@ -221,53 +227,48 @@ const Admin = () => {
 
   // UPDATE FOOD
 
-  const handleUpdateFood = async (e) => {
+  const handleUpdateFood =
+    async (e) => {
 
-    e.preventDefault();
+      e.preventDefault();
 
-    try {
+      try {
 
-      await axios.put(
-        `http://localhost:5000/api/menu/${editId}`,
-        formData,
-        {
-          headers: {
-            Authorization:
-              `Bearer ${adminToken}`,
-          },
-        }
-      );
+        await api.put(
+          `/menu/${editId}`,
+          formData
+        );
 
-      toast.success(
-        "Food updated successfully"
-      );
+        toast.success(
+          "Food updated successfully"
+        );
 
-      setEditId(null);
+        setEditId(null);
 
-      setFormData({
-        name: "",
-        price: "",
-        category: "",
-        restaurant: "",
-        deliverytime: "",
-        rating: "",
-        description: "",
-        image: "",
-      });
+        setFormData({
+          name: "",
+          price: "",
+          category: "",
+          restaurant: "",
+          deliverytime: "",
+          rating: "",
+          description: "",
+          image: "",
+        });
 
-      fetchMenu();
+        fetchMenu();
 
-    } catch (error) {
+      } catch (error) {
 
-      console.log(error);
+        console.log(error);
 
-      toast.error(
-        "Update failed"
-      );
+        toast.error(
+          "Update failed"
+        );
 
-    }
+      }
 
-  };
+    };
 
   return (
 
@@ -302,74 +303,110 @@ const Admin = () => {
 
         <div className="grid md:grid-cols-2 gap-8">
 
+          {/* FOOD NAME */}
+
           <input
             type="text"
             name="name"
             placeholder="Food Name"
             value={formData.name}
-            onChange={handleChange}
+            onChange={
+              handleChange
+            }
             className="bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none"
             required
           />
+
+          {/* PRICE */}
 
           <input
             type="number"
             name="price"
             placeholder="Price"
             value={formData.price}
-            onChange={handleChange}
+            onChange={
+              handleChange
+            }
             className="bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none"
             required
           />
+
+          {/* CATEGORY */}
 
           <input
             type="text"
             name="category"
             placeholder="Category"
             value={formData.category}
-            onChange={handleChange}
+            onChange={
+              handleChange
+            }
             className="bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none"
             required
           />
+
+          {/* RESTAURANT */}
 
           <input
             type="text"
             name="restaurant"
             placeholder="Restaurant Name"
-            value={formData.restaurant}
-            onChange={handleChange}
+            value={
+              formData.restaurant
+            }
+            onChange={
+              handleChange
+            }
             className="bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none"
             required
           />
+
+          {/* DELIVERY TIME */}
 
           <input
             type="text"
             name="deliverytime"
             placeholder="Delivery Time"
-            value={formData.deliverytime}
-            onChange={handleChange}
+            value={
+              formData.deliverytime
+            }
+            onChange={
+              handleChange
+            }
             className="bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none"
             required
           />
+
+          {/* RATING */}
 
           <input
             type="number"
             step="0.1"
             name="rating"
             placeholder="Rating"
-            value={formData.rating}
-            onChange={handleChange}
+            value={
+              formData.rating
+            }
+            onChange={
+              handleChange
+            }
             className="bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none"
             required
           />
 
         </div>
 
+        {/* DESCRIPTION */}
+
         <textarea
           name="description"
           placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
+          value={
+            formData.description
+          }
+          onChange={
+            handleChange
+          }
           rows="5"
           className="w-full mt-8 bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none"
           required
@@ -387,7 +424,9 @@ const Admin = () => {
 
           <input
             type="file"
-            onChange={handleImageUpload}
+            onChange={
+              handleImageUpload
+            }
             className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4"
           />
 
@@ -439,11 +478,15 @@ const Admin = () => {
               className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl"
             >
 
+              {/* IMAGE */}
+
               <img
                 src={item.image}
                 alt={item.name}
                 className="w-full h-56 object-cover"
               />
+
+              {/* CONTENT */}
 
               <div className="p-6">
 
@@ -464,6 +507,8 @@ const Admin = () => {
                   ₹{item.price}
 
                 </p>
+
+                {/* BUTTONS */}
 
                 <div className="flex gap-4">
 
