@@ -55,25 +55,16 @@ api.interceptors.response.use(
 
   (error) => {
 
-    // AUTO LOGOUT ON 401
-
     if (
-      error.response &&
-      error.response.status === 401
-    ) {
+  error.response &&
+  error.response.status === 401
+) {
 
-      localStorage.removeItem(
-        "adminToken"
-      );
+  console.log(
+    "Unauthorized request"
+  );
 
-      localStorage.removeItem(
-        "adminData"
-      );
-
-      window.location.href =
-        "/admin-login";
-
-    }
+}
 
     return Promise.reject(error);
 

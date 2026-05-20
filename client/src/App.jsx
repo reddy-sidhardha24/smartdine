@@ -46,114 +46,67 @@ function App() {
 
         <Routes>
 
-          {/* HOME */}
+  {/* PUBLIC ROUTES */}
 
-          <Route
-            path="/"
-            element={<Home />}
-          />
+  <Route path="/" element={<Home />} />
 
-          {/* MENU */}
+  <Route path="/menu" element={<Menu />} />
 
-          <Route
-            path="/menu"
-            element={<Menu />}
-          />
+  <Route path="/login" element={<Login />} />
 
-          {/* CART */}
+  <Route path="/register" element={<Register />} />
 
-          <Route
-            path="/cart"
-            element={<Cart />}
-          />
+  <Route path="/admin-login" element={<AdminLogin />} />
 
-          {/* CHECKOUT */}
+  <Route path="/careers" element={<Careers />} />
 
-          <Route
-            path="/checkout"
-            element={<Checkout />}
-          />
+  {/* USER ROUTES */}
 
-          {/* USER ORDERS */}
+  <Route path="/cart" element={<Cart />} />
 
-          <Route
-            path="/orders"
-            element={<Orders />}
-          />
+  <Route path="/checkout" element={<Checkout />} />
 
-          {/* LOGIN */}
+  <Route path="/orders" element={<Orders />} />
 
-          <Route
-            path="/login"
-            element={<Login />}
-          />
+  {/* ADMIN ROUTES */}
 
-          {/* REGISTER */}
+  <Route
+    path="/admin"
+    element={
+      <AdminRoute>
+        <Admin />
+      </AdminRoute>
+    }
+  />
 
-          <Route
-            path="/register"
-            element={<Register />}
-          />
+  <Route
+    path="/admin/orders"
+    element={
+      <AdminRoute>
+        <AdminOrders />
+      </AdminRoute>
+    }
+  />
 
-          {/* CAREERS */}
+  <Route
+    path="/admin/dashboard"
+    element={
+      <AdminRoute>
+        <AdminDashboard />
+      </AdminRoute>
+    }
+  />
 
-          <Route
-            path="/careers"
-            element={<Careers />}
-          />
+  <Route
+    path="/admin/reviews"
+    element={
+      <AdminRoute>
+        <AdminReviews />
+      </AdminRoute>
+    }
+  />
 
-          {/* ADMIN LOGIN */}
-
-          <Route
-            path="/admin-login"
-            element={<AdminLogin />}
-          />
-
-          {/* ADMIN PANEL */}
-
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <Admin />
-              </AdminRoute>
-            }
-          />
-
-          {/* ADMIN ORDERS */}
-
-          <Route
-            path="/admin/orders"
-            element={
-              <AdminRoute>
-                <AdminOrders />
-              </AdminRoute>
-            }
-          />
-
-          {/* ADMIN DASHBOARD */}
-
-          <Route
-            path="/admin/dashboard"
-            element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
-            }
-          />
-
-          {/* ADMIN REVIEWS */}
-
-          <Route
-            path="/admin/reviews"
-            element={
-              <AdminRoute>
-                <AdminReviews />
-              </AdminRoute>
-            }
-          />
-
-        </Routes>
+</Routes>
 
       </div>
 

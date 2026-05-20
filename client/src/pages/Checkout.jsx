@@ -58,7 +58,7 @@ const Checkout = () => {
 
     clearCart();
 
-    navigate("/orders");
+    navigate("/");
 
   };
 

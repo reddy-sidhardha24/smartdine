@@ -2,20 +2,18 @@ import { Navigate } from "react-router-dom";
 
 const AdminRoute = ({ children }) => {
 
-  // CHECK TOKEN
-
-  const token =
+  const adminToken =
     localStorage.getItem("adminToken");
 
-  // NOT LOGGED IN
+  // ONLY ADMIN CAN ACCESS
 
-  if (!token) {
+  if (!adminToken) {
 
-    return <Navigate to="/admin-login" />;
+    return (
+      <Navigate to="/admin-login" />
+    );
 
   }
-
-  // ALLOW ACCESS
 
   return children;
 
