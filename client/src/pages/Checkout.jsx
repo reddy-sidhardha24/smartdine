@@ -32,7 +32,7 @@ const Checkout = () => {
 
     }
 
-  }, []);
+  }, [navigate]);
 
   // TOTAL PRICE
 
@@ -50,15 +50,82 @@ const Checkout = () => {
 
   // PLACE ORDER
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
 
-    toast.success(
-      "Order placed successfully!"
-    );
+    try {
 
-    clearCart();
+      const token =
+        localStorage.getItem("token");
 
-    navigate("/");
+      const orderData = {
+
+        items: cartItems,
+
+        total: totalPrice,
+
+        address:
+          "Default Address",
+
+        phone:
+          "9999999999",
+
+        paymentMethod:
+          "Cash On Delivery",
+
+      };
+
+      const response =
+        await fetch(
+          "http://localhost:5000/api/orders",
+          {
+
+            method: "POST",
+
+            headers: {
+
+              "Content-Type":
+                "application/json",
+
+              Authorization:
+                `Bearer ${token}`,
+
+            },
+
+            body: JSON.stringify(
+              orderData
+            ),
+
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.message
+        );
+
+      }
+
+      toast.success(
+        "Order placed successfully!"
+      );
+
+      clearCart();
+
+      navigate("/orders");
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error(
+        "Failed to place order"
+      );
+
+    }
 
   };
 
@@ -126,6 +193,18 @@ const Checkout = () => {
                   </p>
 
                 </div>
+
+              </div>
+
+              <div className="text-right">
+
+                <p className="text-2xl font-bold text-yellow-400">
+
+                  ₹
+                  {item.price *
+                    item.quantity}
+
+                </p>
 
               </div>
 

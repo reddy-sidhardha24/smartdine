@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { toast } from "react-toastify";
-
 import api from "../api/axios";
 
 const Orders = () => {
-
-  // STATE
 
   const [orders, setOrders] =
     useState([]);
@@ -14,144 +10,80 @@ const Orders = () => {
   const [loading, setLoading] =
     useState(true);
 
-  // FETCH ORDERS
-
-  const fetchOrders = async () => {
-
-    try {
-
-      const res =
-        await api.get("/orders");
-
-      setOrders(res.data);
-
-    } catch (error) {
-
-      console.log(error);
-
-      toast.error(
-        "Failed to fetch orders"
-      );
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
-  };
-
   useEffect(() => {
 
-    fetchOrders();
-
-  }, []);
-
-  // CANCEL ORDER
-
-  const cancelOrder =
-    async (id) => {
+    const fetchOrders = async () => {
 
       try {
 
-        await api.delete(
-          `/orders/${id}`
-        );
+        const token =
+          localStorage.getItem("token");
 
-        toast.success(
-          "Order cancelled successfully"
-        );
+        const res =
+          await api.get(
+            "/orders",
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+              },
+            }
+          );
 
-        fetchOrders();
+        console.log(res.data);
+
+        setOrders(res.data);
 
       } catch (error) {
 
         console.log(error);
 
-        toast.error(
-          "Failed to cancel order"
-        );
+      } finally {
+
+        setLoading(false);
 
       }
 
     };
 
+    fetchOrders();
+
+  }, []);
+
   return (
 
-    <div className="min-h-screen bg-black text-white px-6 lg:px-20 py-14">
+    <div className="min-h-screen bg-black text-white px-6 py-10">
 
-      {/* TITLE */}
+      <h1 className="text-5xl font-bold text-yellow-400 mb-10">
 
-      <div className="text-center mb-16">
+        Your Orders
 
-        <h1 className="text-5xl font-extrabold text-yellow-400 mb-5">
-
-          My Orders
-
-        </h1>
-
-        <p className="text-gray-400 text-xl">
-
-          Track your SmartDine food orders
-
-        </p>
-
-      </div>
-
-      {/* LOADING */}
+      </h1>
 
       {loading ? (
 
-        <div className="flex justify-center items-center py-32">
-
-          <h2 className="text-3xl font-bold text-yellow-400 animate-pulse">
-
-            Loading Orders...
-
-          </h2>
-
-        </div>
+        <h2>Loading...</h2>
 
       ) : orders.length === 0 ? (
 
-        /* EMPTY */
-
-        <div className="text-center py-32">
-
-          <h2 className="text-4xl font-bold text-red-400 mb-4">
-
-            No Orders Found
-
-          </h2>
-
-          <p className="text-gray-400 text-xl">
-
-            You have not placed any orders yet.
-
-          </p>
-
-        </div>
+        <h2>No Orders Found</h2>
 
       ) : (
 
-        /* ORDERS LIST */
-
-        <div className="space-y-10">
+        <div className="space-y-8">
 
           {orders.map((order) => (
 
             <div
               key={order.id}
-              className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl"
+              className="bg-slate-900 p-6 rounded-2xl"
             >
 
-              {/* HEADER */}
-
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+              <div className="flex justify-between mb-5">
 
                 <div>
 
-                  <h2 className="text-3xl font-bold mb-3">
+                  <h2 className="text-2xl font-bold text-yellow-400">
 
                     Order #{order.id}
 
@@ -159,107 +91,72 @@ const Orders = () => {
 
                   <p className="text-gray-400">
 
-                    Status:
-                    {" "}
-
-                    <span className="text-green-400 font-bold">
-
-                      {order.status || "Processing"}
-
-                    </span>
+                    {new Date(
+                      order.created_at
+                    ).toLocaleString()}
 
                   </p>
 
                 </div>
 
-                <div className="text-left lg:text-right">
+                <div className="bg-yellow-400 text-black px-4 py-2 rounded-xl font-bold h-fit">
 
-                  <h3 className="text-yellow-400 text-4xl font-extrabold">
-
-                    ₹{order.total}
-
-                  </h3>
+                  {order.status}
 
                 </div>
 
               </div>
 
-              {/* ITEMS */}
+              <div className="space-y-4">
 
-              <div className="space-y-6">
-
-                {order.items &&
-                  order.items.map((item, index) => (
+                {order.items.map(
+                  (item, index) => (
 
                     <div
                       key={index}
-                      className="bg-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                      className="flex justify-between border-b border-slate-700 pb-3"
                     >
 
-                      <div className="flex items-center gap-5">
+                      <div>
 
-                        <img
-                          src={
-                            item.image?.trim()
-                              ? item.image
-                              : "https://via.placeholder.com/120"
-                          }
-                          alt={item.name}
-                          className="w-24 h-24 object-cover rounded-2xl"
-                        />
+                        <h3 className="text-xl font-semibold">
 
-                        <div>
+                          {item.name}
 
-                          <h3 className="text-2xl font-bold mb-2">
+                        </h3>
 
-                            {item.name}
+                        <p className="text-gray-400">
 
-                          </h3>
+                          Quantity:
+                          {" "}
+                          {item.quantity}
 
-                          <p className="text-gray-400">
-
-                            Quantity:
-                            {" "}
-                            {item.quantity}
-
-                          </p>
-
-                        </div>
+                        </p>
 
                       </div>
 
-                      <div className="text-yellow-400 text-2xl font-bold">
+                      <p className="text-yellow-400 font-bold">
 
-                        ₹
-                        {item.price *
-                          item.quantity}
+                        ₹{item.price}
 
-                      </div>
+                      </p>
 
                     </div>
 
-                  ))}
+                  )
+                )}
 
               </div>
 
-              {/* ACTIONS */}
+              <div className="text-right mt-6">
 
-              <div className="mt-8 flex flex-wrap gap-5">
+                <h2 className="text-3xl font-bold text-yellow-400">
 
-                <button
-                  className="bg-green-500 hover:bg-green-600 px-6 py-3 rounded-2xl font-bold transition duration-300"
-                >
-                  Track Order
-                </button>
+                  Total:
+                  {" "}
+                  ₹{order.total}
 
-                <button
-                  onClick={() =>
-                    cancelOrder(order.id)
-                  }
-                  className="bg-red-500 hover:bg-red-600 px-6 py-3 rounded-2xl font-bold transition duration-300"
-                >
-                  Cancel Order
-                </button>
+                </h2>
 
               </div>
 

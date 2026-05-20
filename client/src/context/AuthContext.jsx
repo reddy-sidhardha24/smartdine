@@ -1,7 +1,6 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useState,
 } from "react";
 
@@ -12,46 +11,67 @@ export const AuthProvider = ({
   children,
 }) => {
 
-  // ADMIN TOKEN
+  const [user, setUser] =
+    useState(null);
 
-  const [adminToken, setAdminToken] =
-    useState(
-      localStorage.getItem("adminToken")
+  const [admin, setAdmin] =
+    useState(null);
+
+  // USER LOGIN
+
+  const login = (userData) => {
+
+    localStorage.setItem(
+      "token",
+      userData.token
     );
 
-  // ADMIN DATA
-
-  const [adminData, setAdminData] =
-    useState(
-      JSON.parse(
-        localStorage.getItem("adminData")
-      ) || null
+    localStorage.setItem(
+      "user",
+      JSON.stringify(userData)
     );
 
-  // LOGIN FUNCTION
+    setUser(userData);
+
+  };
+
+  // USER LOGOUT
+
+  const logout = () => {
+
+    localStorage.removeItem(
+      "token"
+    );
+
+    localStorage.removeItem(
+      "user"
+    );
+
+    setUser(null);
+
+  };
+
+  // ADMIN LOGIN
 
   const loginAdmin = (
-    token,
-    admin
+    adminData
   ) => {
 
     localStorage.setItem(
       "adminToken",
-      token
+      adminData.token
     );
 
     localStorage.setItem(
-      "adminData",
-      JSON.stringify(admin)
+      "admin",
+      JSON.stringify(adminData)
     );
 
-    setAdminToken(token);
-
-    setAdminData(admin);
+    setAdmin(adminData);
 
   };
 
-  // LOGOUT FUNCTION
+  // ADMIN LOGOUT
 
   const logoutAdmin = () => {
 
@@ -60,47 +80,21 @@ export const AuthProvider = ({
     );
 
     localStorage.removeItem(
-      "adminData"
+      "admin"
     );
 
-    setAdminToken(null);
-
-    setAdminData(null);
+    setAdmin(null);
 
   };
-
-  // PERSIST LOGIN
-
-  useEffect(() => {
-
-    const token =
-      localStorage.getItem(
-        "adminToken"
-      );
-
-    const admin =
-      JSON.parse(
-        localStorage.getItem(
-          "adminData"
-        )
-      );
-
-    if (token && admin) {
-
-      setAdminToken(token);
-
-      setAdminData(admin);
-
-    }
-
-  }, []);
 
   return (
 
     <AuthContext.Provider
       value={{
-        adminToken,
-        adminData,
+        user,
+        admin,
+        login,
+        logout,
         loginAdmin,
         logoutAdmin,
       }}
@@ -114,10 +108,10 @@ export const AuthProvider = ({
 
 };
 
-// CUSTOM HOOK
-
 export const useAuth = () => {
 
-  return useContext(AuthContext);
+  return useContext(
+    AuthContext
+  );
 
 };

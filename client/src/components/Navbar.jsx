@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+
 import { useState } from "react";
 
 import {
@@ -14,28 +15,15 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] =
     useState(false);
 
-  // ADMIN DATA
-
-  const adminData =
-    localStorage.getItem("adminData")
-      ? JSON.parse(
-          localStorage.getItem(
-            "adminData"
-          )
-        )
-      : null;
-
   // TOKENS
 
   const userToken =
     localStorage.getItem("token");
 
   const adminToken =
-    localStorage.getItem(
-      "adminToken"
-    );
+    localStorage.getItem("adminToken");
 
-  // ACTIVE NAV LINK
+  // ACTIVE LINK
 
   const navLink = (path) => {
 
@@ -45,9 +33,23 @@ const Navbar = () => {
 
   };
 
+  // LOGOUT
+
+  const handleLogout = () => {
+
+    localStorage.removeItem("token");
+
+    localStorage.removeItem("adminToken");
+
+    localStorage.removeItem("adminData");
+
+    window.location.href = "/";
+
+  };
+
   return (
 
-    <nav className="sticky top-0 z-50 bg-black/80 backdrop-blur-lg border-b border-slate-800">
+    <nav className="sticky top-0 z-50 bg-black border-b border-slate-800">
 
       <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
 
@@ -64,7 +66,7 @@ const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-8 text-lg">
 
-          {/* PUBLIC LINKS */}
+          {/* COMMON LINKS */}
 
           <Link
             to="/"
@@ -81,71 +83,96 @@ const Navbar = () => {
           </Link>
 
           <Link
-            to="/orders"
-            className={navLink("/orders")}
-          >
-            Orders
-          </Link>
-
-          <Link
             to="/careers"
             className={navLink("/careers")}
           >
             Careers
           </Link>
 
-          {/* ADMIN LINKS */}
+          {/* USER LINKS */}
 
-          {adminData && (
+          {userToken && !adminToken && (
 
             <>
 
               <Link
-                to="/admin"
-                className={navLink("/admin")}
+                to="/orders"
+                className={navLink("/orders")}
               >
-                Admin
+                Orders
               </Link>
 
               <Link
-                to="/admin/dashboard"
-                className={navLink("/admin/dashboard")}
+                to="/cart"
+                className="text-yellow-400 text-2xl"
               >
-                Dashboard
+                <FaShoppingCart />
               </Link>
 
-              <Link
-                to="/admin/reviews"
-                className={navLink("/admin/reviews")}
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl font-semibold"
               >
-                Reviews
-              </Link>
-
-              <Link
-                to="/admin/orders"
-                className={navLink("/admin/orders")}
-              >
-                Admin Orders
-              </Link>
+                Logout
+              </button>
 
             </>
 
           )}
 
-          {/* CART */}
+          {/* ADMIN LINKS */}
 
-          {(userToken || adminToken) && (
+          {adminToken && (
 
-            <Link
-              to="/cart"
-              className="relative"
-            >
-              <FaShoppingCart className="text-2xl text-yellow-400" />
-            </Link>
+            <>
+
+              <Link
+                to="/orders"
+                className={navLink("/orders")}
+              >
+                Orders
+              </Link>
+
+              <Link
+                to="/admin-dashboard"
+                className={navLink("/admin-dashboard")}
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                to="/admin-orders"
+                className={navLink("/admin-orders")}
+              >
+                Admin Orders
+              </Link>
+
+              <Link
+                to="/menu-edit"
+                className={navLink("/menu-edit")}
+              >
+                Menu Edit
+              </Link>
+
+              <Link
+                to="/cart"
+                className="text-yellow-400 text-2xl"
+              >
+                <FaShoppingCart />
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="bg-blue-500 hover:bg-blue-600 px-5 py-2 rounded-xl font-semibold"
+              >
+                Admin Logout
+              </button>
+
+            </>
 
           )}
 
-          {/* LOGIN BUTTONS */}
+          {/* GUEST LINKS */}
 
           {!userToken && !adminToken && (
 
@@ -176,38 +203,9 @@ const Navbar = () => {
 
           )}
 
-          {/* LOGOUT */}
-
-          {(userToken || adminToken) && (
-
-            <button
-              onClick={() => {
-
-                localStorage.removeItem(
-                  "token"
-                );
-
-                localStorage.removeItem(
-                  "adminToken"
-                );
-
-                localStorage.removeItem(
-                  "adminData"
-                );
-
-                window.location.href = "/";
-
-              }}
-              className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl font-semibold"
-            >
-              Logout
-            </button>
-
-          )}
-
         </div>
 
-        {/* MOBILE MENU BUTTON */}
+        {/* MOBILE BUTTON */}
 
         <button
           className="md:hidden text-3xl text-yellow-400"
@@ -226,7 +224,9 @@ const Navbar = () => {
 
       {menuOpen && (
 
-        <div className="md:hidden bg-slate-950 border-t border-slate-800 px-6 py-6 space-y-5 text-lg">
+        <div className="md:hidden bg-slate-950 px-6 py-6 space-y-5 text-lg">
+
+          {/* COMMON */}
 
           <Link
             to="/"
@@ -249,16 +249,6 @@ const Navbar = () => {
           </Link>
 
           <Link
-            to="/orders"
-            className={`block ${navLink("/orders")}`}
-            onClick={() =>
-              setMenuOpen(false)
-            }
-          >
-            Orders
-          </Link>
-
-          <Link
             to="/careers"
             className={`block ${navLink("/careers")}`}
             onClick={() =>
@@ -268,25 +258,62 @@ const Navbar = () => {
             Careers
           </Link>
 
-          {/* ADMIN MOBILE LINKS */}
+          {/* USER */}
 
-          {adminData && (
+          {userToken && !adminToken && (
 
             <>
 
               <Link
-                to="/admin"
-                className={`block ${navLink("/admin")}`}
+                to="/orders"
+                className={`block ${navLink("/orders")}`}
                 onClick={() =>
                   setMenuOpen(false)
                 }
               >
-                Admin
+                Orders
               </Link>
 
               <Link
-                to="/admin/dashboard"
-                className={`block ${navLink("/admin/dashboard")}`}
+                to="/cart"
+                className="block text-yellow-400"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
+                Cart
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="w-full bg-red-500 py-3 rounded-xl font-semibold"
+              >
+                Logout
+              </button>
+
+            </>
+
+          )}
+
+          {/* ADMIN */}
+
+          {adminToken && (
+
+            <>
+
+              <Link
+                to="/orders"
+                className={`block ${navLink("/orders")}`}
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
+                Orders
+              </Link>
+
+              <Link
+                to="/admin-dashboard"
+                className={`block ${navLink("/admin-dashboard")}`}
                 onClick={() =>
                   setMenuOpen(false)
                 }
@@ -295,18 +322,8 @@ const Navbar = () => {
               </Link>
 
               <Link
-                to="/admin/reviews"
-                className={`block ${navLink("/admin/reviews")}`}
-                onClick={() =>
-                  setMenuOpen(false)
-                }
-              >
-                Reviews
-              </Link>
-
-              <Link
-                to="/admin/orders"
-                className={`block ${navLink("/admin/orders")}`}
+                to="/admin-orders"
+                className={`block ${navLink("/admin-orders")}`}
                 onClick={() =>
                   setMenuOpen(false)
                 }
@@ -314,27 +331,38 @@ const Navbar = () => {
                 Admin Orders
               </Link>
 
+              <Link
+                to="/menu-edit"
+                className={`block ${navLink("/menu-edit")}`}
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
+                Menu Edit
+              </Link>
+
+              <Link
+                to="/cart"
+                className="block text-yellow-400"
+                onClick={() =>
+                  setMenuOpen(false)
+                }
+              >
+                Cart
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="w-full bg-blue-500 py-3 rounded-xl font-semibold"
+              >
+                Admin Logout
+              </button>
+
             </>
 
           )}
 
-          {/* CART */}
-
-          {(userToken || adminToken) && (
-
-            <Link
-              to="/cart"
-              className="block text-yellow-400"
-              onClick={() =>
-                setMenuOpen(false)
-              }
-            >
-              Cart
-            </Link>
-
-          )}
-
-          {/* LOGIN BUTTONS */}
+          {/* GUEST */}
 
           {!userToken && !adminToken && (
 
@@ -342,7 +370,7 @@ const Navbar = () => {
 
               <Link
                 to="/login"
-                className="block text-white"
+                className="block"
                 onClick={() =>
                   setMenuOpen(false)
                 }
@@ -371,35 +399,6 @@ const Navbar = () => {
               </Link>
 
             </>
-
-          )}
-
-          {/* LOGOUT */}
-
-          {(userToken || adminToken) && (
-
-            <button
-              onClick={() => {
-
-                localStorage.removeItem(
-                  "token"
-                );
-
-                localStorage.removeItem(
-                  "adminToken"
-                );
-
-                localStorage.removeItem(
-                  "adminData"
-                );
-
-                window.location.href = "/";
-
-              }}
-              className="w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl font-semibold"
-            >
-              Logout
-            </button>
 
           )}
 

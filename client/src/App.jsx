@@ -29,88 +29,80 @@ function App() {
 
     <BrowserRouter>
 
-      {/* TOAST */}
-
       <ToastContainer
         position="top-right"
         autoClose={2000}
       />
 
-      {/* NAVBAR */}
-
       <Navbar />
-
-      {/* MAIN ROUTES */}
 
       <div className="min-h-screen bg-black text-white">
 
         <Routes>
 
-  {/* PUBLIC ROUTES */}
+          {/* PUBLIC ROUTES */}
 
-  <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home />} />
 
-  <Route path="/menu" element={<Menu />} />
+          <Route path="/menu" element={<Menu />} />
 
-  <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login />} />
 
-  <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<Register />} />
 
-  <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
 
-  <Route path="/careers" element={<Careers />} />
+          <Route path="/careers" element={<Careers />} />
 
-  {/* USER ROUTES */}
+          {/* USER ROUTES */}
 
-  <Route path="/cart" element={<Cart />} />
+          <Route path="/cart" element={<Cart />} />
 
-  <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout" element={<Checkout />} />
 
-  <Route path="/orders" element={<Orders />} />
+          <Route path="/orders" element={<Orders />} />
 
-  {/* ADMIN ROUTES */}
+          {/* ADMIN ROUTES */}
 
-  <Route
-    path="/admin"
-    element={
-      <AdminRoute>
-        <Admin />
-      </AdminRoute>
-    }
-  />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
 
-  <Route
-    path="/admin/orders"
-    element={
-      <AdminRoute>
-        <AdminOrders />
-      </AdminRoute>
-    }
-  />
+          <Route
+            path="/admin-orders"
+            element={
+              <AdminRoute>
+                <AdminOrders />
+              </AdminRoute>
+            }
+          />
 
-  <Route
-    path="/admin/dashboard"
-    element={
-      <AdminRoute>
-        <AdminDashboard />
-      </AdminRoute>
-    }
-  />
+          <Route
+            path="/menu-edit"
+            element={
+              <AdminRoute>
+                <Admin />
+              </AdminRoute>
+            }
+          />
 
-  <Route
-    path="/admin/reviews"
-    element={
-      <AdminRoute>
-        <AdminReviews />
-      </AdminRoute>
-    }
-  />
+          <Route
+            path="/admin-reviews"
+            element={
+              <AdminRoute>
+                <AdminReviews />
+              </AdminRoute>
+            }
+          />
 
-</Routes>
+        </Routes>
 
       </div>
-
-      {/* FOOTER */}
 
       <Footer />
 
