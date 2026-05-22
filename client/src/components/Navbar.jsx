@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 import {
-  FaShoppingCart,
   FaBars,
   FaTimes,
 } from "react-icons/fa";
@@ -104,14 +103,14 @@ const Navbar = () => {
 
               <Link
                 to="/cart"
-                className="text-yellow-400 text-2xl"
+                className="text-yellow-400 font-bold hover:text-yellow-300 transition duration-300"
               >
-                <FaShoppingCart />
+                Cart
               </Link>
 
               <button
                 onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl font-semibold"
+                className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-xl font-semibold transition duration-300"
               >
                 Logout
               </button>
@@ -126,46 +125,57 @@ const Navbar = () => {
 
             <>
 
-              <Link
-                to="/orders"
-                className={navLink("/orders")}
-              >
-                Orders
-              </Link>
+              {/* ADMIN DROPDOWN */}
 
-              <Link
-                to="/admin-dashboard"
-                className={navLink("/admin-dashboard")}
-              >
-                Dashboard
-              </Link>
+              <div className="relative group">
 
-              <Link
-                to="/admin-orders"
-                className={navLink("/admin-orders")}
-              >
-                Admin Orders
-              </Link>
+                <button className="text-yellow-400 font-bold hover:scale-105 transition duration-300">
 
-              <Link
-                to="/menu-edit"
-                className={navLink("/menu-edit")}
-              >
-                Menu Edit
-              </Link>
+                  Admin ▼
 
-              <Link
-                to="/cart"
-                className="text-yellow-400 text-2xl"
-              >
-                <FaShoppingCart />
-              </Link>
+                </button>
+
+                {/* DROPDOWN */}
+
+                <div className="absolute right-0 hidden group-hover:flex flex-col bg-black border border-yellow-400 rounded-2xl mt-4 min-w-[280px] shadow-[0_0_25px_rgba(250,204,21,0.25)] overflow-hidden z-50">
+
+                  <Link
+                    to="/admin-dashboard"
+                    className="px-6 py-4 text-white font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-300 border-b border-slate-800"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <Link
+                    to="/admin-orders"
+                    className="px-6 py-4 text-white font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-300 border-b border-slate-800"
+                  >
+                    Orders Management
+                  </Link>
+
+                  <Link
+                    to="/admin-reviews"
+                    className="px-6 py-4 text-white font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-300 border-b border-slate-800"
+                  >
+                    Customer Reviews
+                  </Link>
+
+                  <Link
+                    to="/menu-edit"
+                    className="px-6 py-4 text-white font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-300"
+                  >
+                    Menu Management
+                  </Link>
+
+                </div>
+
+              </div>
 
               <button
                 onClick={handleLogout}
-                className="bg-blue-500 hover:bg-blue-600 px-5 py-2 rounded-xl font-semibold"
+                className="bg-green-500 hover:bg-green-600 px-5 py-2 rounded-xl font-semibold transition duration-300"
               >
-                Admin Logout
+                Logout
               </button>
 
             </>
@@ -187,14 +197,14 @@ const Navbar = () => {
 
               <Link
                 to="/register"
-                className="bg-yellow-400 text-black px-4 py-2 rounded-xl font-semibold hover:bg-yellow-300"
+                className="bg-yellow-400 text-black px-4 py-2 rounded-xl font-semibold hover:bg-yellow-300 transition duration-300"
               >
                 Register
               </Link>
 
               <Link
                 to="/admin-login"
-                className="bg-red-500 px-4 py-2 rounded-xl font-semibold hover:bg-red-600"
+                className="bg-red-500 px-4 py-2 rounded-xl font-semibold hover:bg-red-600 transition duration-300"
               >
                 Admin Login
               </Link>
@@ -224,7 +234,7 @@ const Navbar = () => {
 
       {menuOpen && (
 
-        <div className="md:hidden bg-slate-950 px-6 py-6 space-y-5 text-lg">
+        <div className="md:hidden bg-slate-950 px-6 py-6 space-y-5 text-lg border-t border-slate-800">
 
           {/* COMMON */}
 
@@ -286,7 +296,7 @@ const Navbar = () => {
 
               <button
                 onClick={handleLogout}
-                className="w-full bg-red-500 py-3 rounded-xl font-semibold"
+                className="w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl font-semibold transition duration-300"
               >
                 Logout
               </button>
@@ -301,61 +311,61 @@ const Navbar = () => {
 
             <>
 
-              <Link
-                to="/orders"
-                className={`block ${navLink("/orders")}`}
-                onClick={() =>
-                  setMenuOpen(false)
-                }
-              >
-                Orders
-              </Link>
+              <div className="bg-black border border-yellow-400 rounded-2xl overflow-hidden">
 
-              <Link
-                to="/admin-dashboard"
-                className={`block ${navLink("/admin-dashboard")}`}
-                onClick={() =>
-                  setMenuOpen(false)
-                }
-              >
-                Dashboard
-              </Link>
+                <p className="px-5 py-4 text-yellow-400 font-bold text-xl border-b border-slate-800">
 
-              <Link
-                to="/admin-orders"
-                className={`block ${navLink("/admin-orders")}`}
-                onClick={() =>
-                  setMenuOpen(false)
-                }
-              >
-                Admin Orders
-              </Link>
+                  Admin Panel
 
-              <Link
-                to="/menu-edit"
-                className={`block ${navLink("/menu-edit")}`}
-                onClick={() =>
-                  setMenuOpen(false)
-                }
-              >
-                Menu Edit
-              </Link>
+                </p>
 
-              <Link
-                to="/cart"
-                className="block text-yellow-400"
-                onClick={() =>
-                  setMenuOpen(false)
-                }
-              >
-                Cart
-              </Link>
+                <Link
+                  to="/admin-dashboard"
+                  className="block px-5 py-4 text-white hover:bg-yellow-400 hover:text-black transition duration-300 border-b border-slate-800"
+                  onClick={() =>
+                    setMenuOpen(false)
+                  }
+                >
+                  Dashboard
+                </Link>
+
+                <Link
+                  to="/admin-orders"
+                  className="block px-5 py-4 text-white hover:bg-yellow-400 hover:text-black transition duration-300 border-b border-slate-800"
+                  onClick={() =>
+                    setMenuOpen(false)
+                  }
+                >
+                  Orders Management
+                </Link>
+
+                <Link
+                  to="/admin-reviews"
+                  className="block px-5 py-4 text-white hover:bg-yellow-400 hover:text-black transition duration-300 border-b border-slate-800"
+                  onClick={() =>
+                    setMenuOpen(false)
+                  }
+                >
+                  Customer Reviews
+                </Link>
+
+                <Link
+                  to="/menu-edit"
+                  className="block px-5 py-4 text-white hover:bg-yellow-400 hover:text-black transition duration-300"
+                  onClick={() =>
+                    setMenuOpen(false)
+                  }
+                >
+                  Menu Management
+                </Link>
+
+              </div>
 
               <button
                 onClick={handleLogout}
-                className="w-full bg-blue-500 py-3 rounded-xl font-semibold"
+                className="w-full bg-green-500 hover:bg-green-600 py-3 rounded-xl font-semibold transition duration-300"
               >
-                Admin Logout
+                Logout
               </button>
 
             </>

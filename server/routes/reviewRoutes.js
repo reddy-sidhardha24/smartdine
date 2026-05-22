@@ -72,7 +72,12 @@ router.post("/", async (req, res) => {
       message: "Failed to add review",
     });
 
-    // DELETE REVIEW
+  }
+
+});
+
+
+// DELETE REVIEW
 
 router.delete("/:id", async (req, res) => {
 
@@ -104,8 +109,5 @@ router.delete("/:id", async (req, res) => {
 
 });
 
-  }
-
-});
 
 module.exports = router;

@@ -9,6 +9,22 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  LineChart,
+  Line,
+  Legend,
+} from "recharts";
+
 const AdminDashboard = () => {
 
   const [stats, setStats] =
@@ -57,6 +73,68 @@ const AdminDashboard = () => {
     fetchStats();
 
   }, []);
+
+  // PIE CHART DATA
+
+  const pieData = [
+    {
+      name: "Pending",
+      value: stats.pendingOrders,
+    },
+    {
+      name: "Delivered",
+      value: stats.deliveredOrders,
+    },
+  ];
+
+  // BAR CHART DATA
+
+  const barData = [
+    {
+      name: "Orders",
+      value: stats.totalOrders,
+    },
+    {
+      name: "Revenue",
+      value: stats.totalRevenue,
+    },
+    {
+      name: "Pending",
+      value: stats.pendingOrders,
+    },
+    {
+      name: "Delivered",
+      value: stats.deliveredOrders,
+    },
+  ];
+
+  // LINE CHART DATA
+
+  const lineData = [
+    {
+      name: "Orders",
+      value: stats.totalOrders,
+    },
+    {
+      name: "Revenue",
+      value: stats.totalRevenue,
+    },
+    {
+      name: "Pending",
+      value: stats.pendingOrders,
+    },
+    {
+      name: "Delivered",
+      value: stats.deliveredOrders,
+    },
+  ];
+
+  const COLORS = [
+    "#facc15",
+    "#22c55e",
+    "#3b82f6",
+    "#a855f7",
+  ];
 
   // LOADING
 
@@ -226,63 +304,130 @@ const AdminDashboard = () => {
 
       </div>
 
-      {/* QUICK ACTIONS */}
+      {/* ANALYTICS CHARTS */}
 
-      <div className="mt-16">
+      <div className="mt-20">
 
-        <h2 className="text-4xl font-bold text-yellow-400 mb-8">
+        <h2 className="text-4xl font-bold text-yellow-400 mb-10">
 
-          Quick Actions
+          Analytics Overview
 
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-2 gap-10">
 
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 hover:scale-105 transition">
+          {/* PIE CHART */}
 
-            <h3 className="text-3xl font-bold mb-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
 
-              Manage Orders
+            <h3 className="text-2xl font-bold mb-6">
+
+              Order Distribution
 
             </h3>
 
-            <p className="text-gray-400">
+            <ResponsiveContainer width="100%" height={300}>
 
-              Update delivery statuses and monitor active orders.
+              <PieChart>
 
-            </p>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  dataKey="value"
+                  label
+                >
+
+                  {
+                    pieData.map((entry, index) => (
+
+                      <Cell
+                        key={index}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+
+                    ))
+                  }
+
+                </Pie>
+
+                <Tooltip />
+
+              </PieChart>
+
+            </ResponsiveContainer>
 
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 hover:scale-105 transition">
+          {/* BAR CHART */}
 
-            <h3 className="text-3xl font-bold mb-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
 
-              Menu Management
+            <h3 className="text-2xl font-bold mb-6">
+
+              Business Metrics
 
             </h3>
 
-            <p className="text-gray-400">
+            <ResponsiveContainer width="100%" height={300}>
 
-              Add, edit, and remove menu items from SmartDine.
+              <BarChart data={barData}>
 
-            </p>
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis dataKey="name" />
+
+                <YAxis />
+
+                <Tooltip />
+
+                <Bar
+                  dataKey="value"
+                  fill="#facc15"
+                  radius={[10, 10, 0, 0]}
+                />
+
+              </BarChart>
+
+            </ResponsiveContainer>
 
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 hover:scale-105 transition">
+          {/* LINE CHART */}
 
-            <h3 className="text-3xl font-bold mb-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 lg:col-span-2">
 
-              Customer Reviews
+            <h3 className="text-2xl font-bold mb-6">
+
+              Performance Trend
 
             </h3>
 
-            <p className="text-gray-400">
+            <ResponsiveContainer width="100%" height={350}>
 
-              Monitor feedback and customer satisfaction.
+              <LineChart data={lineData}>
 
-            </p>
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis dataKey="name" />
+
+                <YAxis />
+
+                <Tooltip />
+
+                <Legend />
+
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#22c55e"
+                  strokeWidth={4}
+                />
+
+              </LineChart>
+
+            </ResponsiveContainer>
 
           </div>
 
