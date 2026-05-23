@@ -22,6 +22,11 @@ const AdminLogin = () => {
       password: "",
     });
 
+  // SHOW / HIDE PASSWORD
+
+  const [showPassword, setShowPassword] =
+    useState(false);
+
   // LOADING
 
   const [loading, setLoading] =
@@ -66,7 +71,7 @@ const AdminLogin = () => {
 
       // REDIRECT
 
-      navigate("/admin");
+      navigate("/admin-dashboard");
 
     } catch (error) {
 
@@ -101,7 +106,7 @@ const AdminLogin = () => {
 
         <p className="text-center text-gray-400 mb-10 text-lg">
 
-          Admin Authentication Portal
+          Secure Admin Access
 
         </p>
 
@@ -144,15 +149,41 @@ const AdminLogin = () => {
 
             </label>
 
-            <input
-              type="password"
-              name="password"
-              placeholder="Enter password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 outline-none focus:border-yellow-400"
-              required
-            />
+            <div className="relative">
+
+              <input
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
+                name="password"
+                placeholder="Enter password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 pr-28 outline-none focus:border-yellow-400"
+                required
+              />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPassword(
+                    !showPassword
+                  )
+                }
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-yellow-400 font-semibold hover:text-yellow-300 transition"
+              >
+
+                {
+                  showPassword
+                    ? "Hide"
+                    : "Show"
+                }
+
+              </button>
+
+            </div>
 
           </div>
 
@@ -171,34 +202,6 @@ const AdminLogin = () => {
           </button>
 
         </form>
-
-        {/* TEST CREDENTIALS */}
-
-        <div className="mt-10 bg-slate-800 rounded-2xl p-5 border border-slate-700">
-
-          <h3 className="text-yellow-400 font-bold mb-3">
-
-            Test Credentials
-
-          </h3>
-
-          <p className="text-gray-300">
-
-            Email:
-            {" "}
-            admin@smartdine.com
-
-          </p>
-
-          <p className="text-gray-300 mt-2">
-
-            Password:
-            {" "}
-            admin123
-
-          </p>
-
-        </div>
 
       </div>
 

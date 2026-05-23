@@ -10,9 +10,16 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] =
+    useState("");
 
-  const [password, setPassword] = useState("");
+  const [password, setPassword] =
+    useState("");
+
+  // SHOW / HIDE PASSWORD
+
+  const [showPassword, setShowPassword] =
+    useState(false);
 
   // LOGIN FUNCTION
 
@@ -27,7 +34,9 @@ const Login = () => {
       !password.trim()
     ) {
 
-      toast.error("All fields are required");
+      toast.error(
+        "All fields are required"
+      );
 
       return;
 
@@ -40,7 +49,9 @@ const Login = () => {
 
     if (!emailRegex.test(email)) {
 
-      toast.error("Enter valid email");
+      toast.error(
+        "Enter valid email"
+      );
 
       return;
 
@@ -73,7 +84,9 @@ const Login = () => {
         res.data.token
       );
 
-      toast.success("Login successful");
+      toast.success(
+        "Login successful"
+      );
 
       navigate("/");
 
@@ -91,6 +104,7 @@ const Login = () => {
   };
 
   return (
+
     <div className="min-h-screen bg-black flex items-center justify-center px-6">
 
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-10 shadow-2xl">
@@ -98,7 +112,9 @@ const Login = () => {
         {/* TITLE */}
 
         <h1 className="text-5xl font-extrabold text-center text-yellow-400 mb-10">
+
           Login
+
         </h1>
 
         {/* FORM */}
@@ -113,7 +129,9 @@ const Login = () => {
           <div>
 
             <label className="block mb-2 text-lg font-semibold text-white">
+
               Email Address
+
             </label>
 
             <input
@@ -133,18 +151,48 @@ const Login = () => {
           <div>
 
             <label className="block mb-2 text-lg font-semibold text-white">
+
               Password
+
             </label>
 
-            <input
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
-              }
-              className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none focus:border-yellow-400"
-            />
+            <div className="relative">
+
+              <input
+                type={
+                  showPassword
+                    ? "text"
+                    : "password"
+                }
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) =>
+                  setPassword(
+                    e.target.value
+                  )
+                }
+                className="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 pr-24 text-white outline-none focus:border-yellow-400"
+              />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPassword(
+                    !showPassword
+                  )
+                }
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-yellow-400 font-semibold hover:text-yellow-300 transition"
+              >
+
+                {
+                  showPassword
+                    ? "Hide"
+                    : "Show"
+                }
+
+              </button>
+
+            </div>
 
           </div>
 
@@ -154,7 +202,9 @@ const Login = () => {
             type="submit"
             className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-4 rounded-2xl text-xl font-bold transition duration-300"
           >
+
             Login
+
           </button>
 
         </form>
@@ -169,7 +219,9 @@ const Login = () => {
             to="/register"
             className="text-yellow-400 font-bold ml-2 hover:underline"
           >
+
             Register
+
           </Link>
 
         </p>
@@ -177,7 +229,9 @@ const Login = () => {
       </div>
 
     </div>
+
   );
+
 };
 
 export default Login;

@@ -1,6 +1,11 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import api from "../api/axios";
+
+import { toast } from "react-toastify";
 
 const Orders = () => {
 
@@ -9,6 +14,11 @@ const Orders = () => {
 
   const [loading, setLoading] =
     useState(true);
+
+  const [reviewData, setReviewData] =
+    useState({});
+
+  // FETCH ORDERS
 
   useEffect(() => {
 
@@ -30,8 +40,6 @@ const Orders = () => {
             }
           );
 
-        console.log(res.data);
-
         setOrders(res.data);
 
       } catch (error) {
@@ -50,46 +58,194 @@ const Orders = () => {
 
   }, []);
 
+  // HANDLE REVIEW INPUT
+
+  const handleReviewChange = (
+    orderId,
+    field,
+    value
+  ) => {
+
+    setReviewData({
+
+      ...reviewData,
+
+      [orderId]: {
+
+        ...reviewData[orderId],
+
+        [field]: value,
+
+      },
+
+    });
+
+  };
+
+  // SUBMIT REVIEW
+
+  const submitReview = async (
+    item,
+    orderId
+  ) => {
+
+    try {
+
+      const data =
+        reviewData[orderId];
+
+      if (
+        !data?.rating ||
+        !data?.comment
+      ) {
+
+        toast.error(
+          "Please add rating and review"
+        );
+
+        return;
+
+      }
+
+      await api.post("/reviews", {
+
+        food_name: item.name,
+
+        customer_name:
+          "Customer",
+
+        rating: Number(
+          data.rating
+        ),
+
+        comment: data.comment,
+
+      });
+
+      toast.success(
+        "Review submitted successfully"
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error(
+        "Failed to submit review"
+      );
+
+    }
+
+  };
+
+  // STATUS COLORS
+
+  const getStatusColor = (
+    status
+  ) => {
+
+    if (
+      status === "Delivered"
+    ) {
+
+      return "bg-green-500";
+
+    }
+
+    if (
+      status === "Preparing"
+    ) {
+
+      return "bg-yellow-400 text-black";
+
+    }
+
+    return "bg-blue-500";
+
+  };
+
   return (
 
-    <div className="min-h-screen bg-black text-white px-6 py-10">
+    <div className="min-h-screen bg-black text-white px-6 lg:px-20 py-12">
 
-      <h1 className="text-5xl font-bold text-yellow-400 mb-10">
+      {/* HEADER */}
 
-        Your Orders
+      <div className="mb-14">
 
-      </h1>
+        <h1 className="text-5xl font-extrabold text-yellow-400 mb-4">
+
+          Your Orders
+
+        </h1>
+
+        <p className="text-gray-400 text-lg">
+
+          Track your food orders and delivery status
+
+        </p>
+
+      </div>
+
+      {/* LOADING */}
 
       {loading ? (
 
-        <h2>Loading...</h2>
+        <div className="text-center mt-20">
+
+          <h2 className="text-3xl font-bold text-yellow-400">
+
+            Loading Orders...
+
+          </h2>
+
+        </div>
 
       ) : orders.length === 0 ? (
 
-        <h2>No Orders Found</h2>
+        <div className="flex justify-center items-center mt-24">
+
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center max-w-xl w-full">
+
+            <h2 className="text-4xl font-bold mb-5">
+
+              No Orders Found
+
+            </h2>
+
+            <p className="text-gray-400">
+
+              Your placed orders will appear here
+
+            </p>
+
+          </div>
+
+        </div>
 
       ) : (
 
-        <div className="space-y-8">
+        <div className="space-y-10">
 
           {orders.map((order) => (
 
             <div
               key={order.id}
-              className="bg-slate-900 p-6 rounded-2xl"
+              className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl"
             >
 
-              <div className="flex justify-between mb-5">
+              {/* TOP */}
+
+              <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-6 px-8 py-6 border-b border-slate-800">
 
                 <div>
 
-                  <h2 className="text-2xl font-bold text-yellow-400">
+                  <h2 className="text-3xl font-extrabold text-yellow-400">
 
                     Order #{order.id}
 
                   </h2>
 
-                  <p className="text-gray-400">
+                  <p className="text-gray-400 mt-2">
 
                     {new Date(
                       order.created_at
@@ -99,64 +255,193 @@ const Orders = () => {
 
                 </div>
 
-                <div className="bg-yellow-400 text-black px-4 py-2 rounded-xl font-bold h-fit">
+                <div className="flex items-center gap-5">
 
-                  {order.status}
+                  <div className={`${getStatusColor(
+                    order.status
+                  )} px-6 py-3 rounded-2xl font-bold text-lg`}>
+
+                    {order.status}
+
+                  </div>
+
+                  <h2 className="text-3xl font-extrabold text-yellow-400">
+
+                    ₹{order.total}
+
+                  </h2>
 
                 </div>
 
               </div>
 
-              <div className="space-y-4">
+              {/* ITEMS */}
+
+              <div className="p-8 space-y-6">
 
                 {order.items.map(
                   (item, index) => (
 
                     <div
                       key={index}
-                      className="flex justify-between border-b border-slate-700 pb-3"
+                      className="bg-black border border-slate-800 rounded-3xl p-6"
                     >
 
-                      <div>
+                      <div className="flex flex-col lg:flex-row justify-between gap-6">
 
-                        <h3 className="text-xl font-semibold">
+                        {/* LEFT */}
 
-                          {item.name}
+                        <div className="flex gap-5">
 
-                        </h3>
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-28 h-28 rounded-2xl object-cover"
+                          />
 
-                        <p className="text-gray-400">
+                          <div>
 
-                          Quantity:
-                          {" "}
-                          {item.quantity}
+                            <h3 className="text-3xl font-bold">
 
-                        </p>
+                              {item.name}
+
+                            </h3>
+
+                            <p className="text-gray-400 mt-2 text-lg">
+
+                              Quantity:
+                              {" "}
+                              {item.quantity}
+
+                            </p>
+
+                            <p className="text-yellow-400 font-bold text-2xl mt-3">
+
+                              ₹{item.price}
+
+                            </p>
+
+                          </div>
+
+                        </div>
+
+                        {/* REVIEW SECTION */}
+
+                        {
+                          order.status ===
+                          "Delivered" && (
+
+                            <div className="lg:w-[400px] bg-slate-900 border border-slate-800 rounded-3xl p-6">
+
+                              <h3 className="text-2xl font-bold text-yellow-400 mb-5">
+
+                                Give Review
+
+                              </h3>
+
+                              {/* RATING */}
+
+                              <select
+                                value={
+                                  reviewData[
+                                    order.id
+                                  ]?.rating || ""
+                                }
+                                onChange={(e) =>
+                                  handleReviewChange(
+                                    order.id,
+                                    "rating",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full bg-black border border-slate-700 rounded-2xl px-5 py-4 mb-5 outline-none focus:border-yellow-400"
+                              >
+
+                                <option value="">
+
+                                  Select Rating
+
+                                </option>
+
+                                <option value="5">
+
+                                  ⭐⭐⭐⭐⭐
+
+                                </option>
+
+                                <option value="4">
+
+                                  ⭐⭐⭐⭐
+
+                                </option>
+
+                                <option value="3">
+
+                                  ⭐⭐⭐
+
+                                </option>
+
+                                <option value="2">
+
+                                  ⭐⭐
+
+                                </option>
+
+                                <option value="1">
+
+                                  ⭐
+
+                                </option>
+
+                              </select>
+
+                              {/* COMMENT */}
+
+                              <textarea
+                                rows="4"
+                                placeholder="Write your review..."
+                                value={
+                                  reviewData[
+                                    order.id
+                                  ]?.comment || ""
+                                }
+                                onChange={(e) =>
+                                  handleReviewChange(
+                                    order.id,
+                                    "comment",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full bg-black border border-slate-700 rounded-2xl px-5 py-4 outline-none focus:border-yellow-400 resize-none"
+                              />
+
+                              {/* BUTTON */}
+
+                              <button
+                                onClick={() =>
+                                  submitReview(
+                                    item,
+                                    order.id
+                                  )
+                                }
+                                className="w-full mt-5 bg-yellow-400 hover:bg-yellow-500 text-black py-4 rounded-2xl font-bold text-lg transition duration-300"
+                              >
+
+                                Submit Review
+
+                              </button>
+
+                            </div>
+
+                          )
+                        }
 
                       </div>
-
-                      <p className="text-yellow-400 font-bold">
-
-                        ₹{item.price}
-
-                      </p>
 
                     </div>
 
                   )
                 )}
-
-              </div>
-
-              <div className="text-right mt-6">
-
-                <h2 className="text-3xl font-bold text-yellow-400">
-
-                  Total:
-                  {" "}
-                  ₹{order.total}
-
-                </h2>
 
               </div>
 
