@@ -206,17 +206,7 @@ const Menu = () => {
 
         <div className="relative z-10 text-center">
 
-          <div className="inline-flex items-center gap-3 bg-slate-900 border border-yellow-400/20 px-6 py-3 rounded-full mb-8">
-
-            <span className="w-3 h-3 rounded-full bg-green-400 animate-pulse"></span>
-
-            <span className="text-yellow-400 font-semibold">
-
-              Live Restaurant Menu
-
-            </span>
-
-          </div>
+          
 
           <h1 className="text-6xl lg:text-7xl font-extrabold text-yellow-400 mb-6 leading-tight">
 

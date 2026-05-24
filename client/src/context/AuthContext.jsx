@@ -54,22 +54,23 @@ export const AuthProvider = ({
   // ADMIN LOGIN
 
   const loginAdmin = (
-    adminData
-  ) => {
+  token,
+  adminData
+) => {
 
-    localStorage.setItem(
-      "adminToken",
-      adminData.token
-    );
+  localStorage.setItem(
+    "adminToken",
+    token
+  );
 
-    localStorage.setItem(
-      "admin",
-      JSON.stringify(adminData)
-    );
+  localStorage.setItem(
+    "admin",
+    JSON.stringify(adminData)
+  );
 
-    setAdmin(adminData);
+  setAdmin(adminData);
 
-  };
+};
 
   // ADMIN LOGOUT
 
